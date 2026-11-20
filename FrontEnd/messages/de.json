@@ -1,5 +1,6 @@
 {
   "Metadata": { "title": "VYBERN Eyewear", "description": "Ein durchdachtes Fundament für VYBERN Eyewear." },
+  "Admin": { "control": "Admin-Steuerung", "dashboard": "Dashboard", "products": "Produkte", "orders": "Bestellungen", "customers": "Kunden", "inventory": "Bestand", "payments": "Zahlungen", "settings": "Shop-Einstellungen", "accessDenied": "Administrativer Zugriff ist erforderlich.", "loading": "Administration wird geladen…", "revenue": "Bezahlter Umsatz", "ordersTotal": "Bestellungen", "customersTotal": "Kunden", "activeProducts": "Aktive Produkte", "lowStock": "Niedriger Bestand", "pendingOrders": "Offene Bestellungen", "recentOrders": "Letzte Bestellungen", "topProducts": "Meistverkaufte Produkte", "noData": "Für diesen Zeitraum sind keine Daten verfügbar." },
   "Otp": { "retryIn": "Erneut versuchen in {seconds}s" },
   "Payment": { "status": "Zahlung: {status}", "PENDING": "Ausstehend", "SUCCEEDED": "Bezahlt", "FAILED": "Fehlgeschlagen", "CANCELLED": "Storniert", "EXPIRED": "Abgelaufen" },
   "Avatar": { "upload": "Foto hochladen", "uploading": "Wird hochgeladen…", "remove": "Foto entfernen", "error": "Ihr Foto konnte nicht aktualisiert werden." },

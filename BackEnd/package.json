@@ -22,7 +22,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
     "prisma:seed": "prisma db seed",
-    "admin:bootstrap": "tsx src/scripts/bootstrap-super-admin.ts"
+    "admin:bootstrap": "tsx src/scripts/bootstrap-super-admin.ts",
+    "admin:provision": "tsx src/scripts/provision-admin.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

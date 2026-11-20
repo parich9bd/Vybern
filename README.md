@@ -50,6 +50,7 @@ FrontEnd/  Next.js storefront, design tokens, i18n and UI components
 - Customer account area with profile editing, OTP-backed sessions, order/payment history and an Iranian address book.
 - Customer avatar upload, replacement and removal. Files are content-validated JPEG, PNG or WebP assets stored outside PostgreSQL; only a server-controlled storage key is persisted.
 - Account navigation is keyboard-accessible and responsive; address validation uses inline, field-level server feedback without discarding entered values.
+- Administration uses server-side role and permission guards. The locale-aware dashboard consumes aggregated `/admin/dashboard` data; administrator provisioning is an operator-only CLI, never a public endpoint.
 
 ### Partially implemented
 
@@ -80,6 +81,8 @@ Authentication uses OTP verification. A successful verification sets an opaque H
 OTP requests require an E.164 number (for example, an Iranian number beginning `+98`). The service applies a per-number resend cooldown and per-number/per-IP request windows. The storefront honours the server's `Retry-After` response and shows a countdown; wait for it to complete rather than repeatedly submitting the form.
 
 Customer account endpoints include `GET/PATCH /account/profile`, `GET/POST/PATCH/DELETE /account/addresses`, `GET /orders`, `GET /orders/:orderId`, `GET /account/payments`, and `POST/GET/DELETE /account/avatar`. Avatar writes require CSRF protection; the avatar content endpoint only serves the authenticated owner.
+
+Administrator endpoints are protected by the existing role guard, including `/admin/me`, `/admin/dashboard`, order/customer/payment monitoring, inventory, catalog and store-settings operations. Use `npm run admin:provision` only through a trusted local operator workflow after the account has completed OTP authentication.
 
 Run the backend locally to access Swagger UI at `http://localhost:3001/docs` for the complete, generated contract.
 

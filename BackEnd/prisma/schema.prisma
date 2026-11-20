@@ -96,6 +96,7 @@ model User {
   cart      Cart?
   orders    Order[]
   auditLogs AuditLog[] @relation("AuditActor")
+  adminProvisioningEvents AdminProvisioningEvent[] @relation("ProvisioningTarget")
   addresses CustomerAddress[]
   discountRedemptions DiscountRedemption[]
   createdAt DateTime   @default(now())
@@ -154,6 +155,18 @@ model AuditLog {
   @@index([actorUserId, createdAt])
   @@index([targetType, targetId, createdAt])
   @@index([action, createdAt])
+}
+
+model AdminProvisioningEvent {
+  id             String   @id @default(cuid())
+  targetUserId   String
+  operation      String   @db.VarChar(80)
+  operatorLabel  String   @db.VarChar(120)
+  target         User     @relation("ProvisioningTarget", fields: [targetUserId], references: [id], onDelete: Restrict)
+  createdAt      DateTime @default(now())
+
+  @@unique([targetUserId, operation])
+  @@index([createdAt])
 }
 
 model Order {

@@ -1,5 +1,6 @@
 {
   "Metadata": { "title": "وایبِرن آی‌وِر", "description": "زیربنای سنجیده‌ای برای وایبِرن آی‌وِر." },
+  "Admin": { "control": "کنترل مدیریت", "dashboard": "داشبورد", "products": "محصولات", "orders": "سفارش‌ها", "customers": "مشتریان", "inventory": "موجودی", "payments": "پرداخت‌ها", "settings": "تنظیمات فروشگاه", "accessDenied": "دسترسی مدیریتی لازم است.", "loading": "در حال بارگذاری مدیریت…", "revenue": "درآمد پرداخت‌شده", "ordersTotal": "سفارش‌ها", "customersTotal": "مشتریان", "activeProducts": "محصولات فعال", "lowStock": "موجودی کم", "pendingOrders": "سفارش‌های در انتظار", "recentOrders": "سفارش‌های اخیر", "topProducts": "محصولات پرفروش", "noData": "برای این بازه داده‌ای موجود نیست." },
   "Otp": { "retryIn": "تلاش دوباره تا {seconds} ثانیه" },
   "Payment": { "status": "پرداخت: {status}", "PENDING": "در انتظار", "SUCCEEDED": "پرداخت‌شده", "FAILED": "ناموفق", "CANCELLED": "لغوشده", "EXPIRED": "منقضی" },
   "Avatar": { "upload": "بارگذاری عکس", "uploading": "در حال بارگذاری…", "remove": "حذف عکس", "error": "به‌روزرسانی عکس انجام نشد." },

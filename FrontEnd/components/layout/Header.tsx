@@ -8,7 +8,7 @@ import type { Locale } from '@/i18n/routing';
 import { AuthenticationModal } from '@/components/auth/AuthenticationModal';
 import { apiUrl, AuthApiError, getCurrentUser, logout, type AuthUser } from '@/lib/auth-client';
 import { AnnouncementBar } from './AnnouncementBar';
-import { BagIcon, CheckIcon, ChevronIcon, CloseIcon, GlassesIcon, LanguagesIcon, LocationIcon, LogoutIcon, MenuIcon, OrdersIcon, SearchIcon, SettingsIcon, UserIcon } from './icons';
+import { BagIcon, CheckIcon, ChevronIcon, CloseIcon, GlassesIcon, LanguagesIcon, LocationIcon, LogoutIcon, MenuIcon, OrdersIcon, SearchIcon, SettingsIcon, ShieldIcon, UserIcon } from './icons';
 import styles from './Header.module.css';
 
 const languages: ReadonlyArray<{ code: Locale; label: string; native: string }> = [
@@ -34,6 +34,7 @@ function PendingAction({ label, children, className }: PendingActionProps) {
 export default function Header() {
   const t = useTranslations('Header');
   const accountT = useTranslations('Account');
+  const adminT = useTranslations('Admin');
   const locale = useLocale() as Locale;
   const pathname = usePathname();
   const router = useRouter();
@@ -175,6 +176,7 @@ export default function Header() {
                   <Link onClick={() => setIsAccountOpen(false)} role="menuitem" href="/account/orders"><OrdersIcon />{accountT('orders')}</Link>
                   <Link onClick={() => setIsAccountOpen(false)} role="menuitem" href="/account/addresses"><LocationIcon />{accountT('addresses')}</Link>
                   <Link onClick={() => setIsAccountOpen(false)} role="menuitem" href="/account/settings"><SettingsIcon />{accountT('settings')}</Link>
+                  {(authUser.role === 'ADMIN' || authUser.role === 'SUPER_ADMIN') && <Link onClick={() => setIsAccountOpen(false)} role="menuitem" href="/admin"><ShieldIcon />{adminT('control')}</Link>}
                 </div>
                 <button disabled={isLoggingOut} onClick={handleLogout} role="menuitem" type="button"><LogoutIcon />{isLoggingOut ? t('loggingOut') : t('logout')}</button>
               </div>

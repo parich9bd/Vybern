@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { apiUrl, AuthApiError } from '@/lib/auth-client';
-import { LocationIcon, OrdersIcon, SettingsIcon, UserIcon } from '@/components/layout/icons';
+import { DashboardIcon, LocationIcon, OrdersIcon, SettingsIcon, UserIcon } from '@/components/layout/icons';
 import { deleteAddress, getAddresses, getOrder, getOrders, getPayments, getProfile, removeAvatar, saveAddress, updateProfile, uploadAvatar, type AddressInput, type CustomerAddress, type CustomerOrder, type CustomerPayment, type CustomerProfile } from '@/lib/account-client';
 import styles from './AccountArea.module.css';
 
@@ -32,7 +32,7 @@ export function AccountArea({ section, orderId }: Props) {
   }, []);
 
   const navigation = useMemo(() => [
-    ['overview', '/account', t('overview'), <UserIcon key="overview" />], ['profile', '/account/profile', t('profile'), <UserIcon key="profile" />], ['orders', '/account/orders', t('orders'), <OrdersIcon key="orders" />], ['addresses', '/account/addresses', t('addresses'), <LocationIcon key="addresses" />], ['settings', '/account/settings', t('settings'), <SettingsIcon key="settings" />],
+    ['overview', '/account', t('overview'), <DashboardIcon key="overview" />], ['profile', '/account/profile', t('profile'), <UserIcon key="profile" />], ['orders', '/account/orders', t('orders'), <OrdersIcon key="orders" />], ['addresses', '/account/addresses', t('addresses'), <LocationIcon key="addresses" />], ['settings', '/account/settings', t('settings'), <SettingsIcon key="settings" />],
   ] as const, [t]);
 
   if (loading) return <main className={styles.state}><p>{t('loading')}</p></main>;

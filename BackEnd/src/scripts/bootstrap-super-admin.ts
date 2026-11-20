@@ -20,8 +20,10 @@ async function main(): Promise<void> {
   try {
     const existing = await prisma.user.count({ where: { role: UserRole.SUPER_ADMIN } });
     if (existing > 0) throw new Error('A super administrator already exists; bootstrap is permanently closed');
-    const user = await prisma.user.upsert({ where: { phone }, update: { role: UserRole.SUPER_ADMIN }, create: { phone, role: UserRole.SUPER_ADMIN } });
-    await prisma.auditLog.create({ data: { actorUserId: user.id, action: 'SUPER_ADMIN_BOOTSTRAPPED', targetType: 'User', targetId: user.id } });
+    const user = await prisma.user.findUnique({ where: { phone } });
+    if (!user) throw new Error('The administrator account must complete normal OTP authentication before provisioning');
+    const provisioned = await prisma.user.update({ where: { id: user.id }, data: { role: UserRole.SUPER_ADMIN } });
+    await prisma.auditLog.create({ data: { actorUserId: provisioned.id, action: 'SUPER_ADMIN_BOOTSTRAPPED', targetType: 'User', targetId: provisioned.id } });
     console.log('Super administrator provisioned. Remove bootstrap environment variables now.');
   } finally {
     await prisma.$disconnect();
