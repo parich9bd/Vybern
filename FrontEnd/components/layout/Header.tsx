@@ -1,10 +1,12 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useId, useState, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import type { Locale } from '@/i18n/routing';
+import { AuthenticationModal } from '@/components/auth/AuthenticationModal';
+import { AuthApiError, getCurrentUser, logout, type AuthUser } from '@/lib/auth-client';
 import { AnnouncementBar } from './AnnouncementBar';
 import { BagIcon, CheckIcon, ChevronIcon, CloseIcon, GlassesIcon, LanguagesIcon, MenuIcon, SearchIcon, UserIcon } from './icons';
 import styles from './Header.module.css';
@@ -36,14 +38,22 @@ export default function Header() {
   const router = useRouter();
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAuthenticationOpen, setIsAuthenticationOpen] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const [authUser, setAuthUser] = useState<AuthUser | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [accountError, setAccountError] = useState<string | null>(null);
+  const accountButtonRef = useRef<HTMLButtonElement>(null);
   const menuId = useId();
   const languageMenuId = useId();
+  const accountMenuId = useId();
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setIsLanguageOpen(false);
         setIsMobileMenuOpen(false);
+        setIsAccountOpen(false);
       }
     };
 
@@ -51,15 +61,45 @@ export default function Header() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  useEffect(() => {
+    let isMounted = true;
+    getCurrentUser().then((user) => {
+      if (isMounted) setAuthUser(user);
+    }).catch(() => {
+      if (isMounted) setAuthUser(null);
+    });
+    return () => { isMounted = false; };
+  }, []);
+
   const changeLocale = (nextLocale: Locale) => {
     setIsLanguageOpen(false);
     if (nextLocale !== locale) router.replace(pathname, { locale: nextLocale });
   };
 
+  const handleLogout = async () => {
+    setAccountError(null);
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      setAuthUser(null);
+      setIsAccountOpen(false);
+    } catch (error) {
+      if (error instanceof AuthApiError && (error.status === 401 || error.status === 403)) {
+        setAuthUser(null);
+        setIsAccountOpen(false);
+        setIsAuthenticationOpen(true);
+      } else {
+        setAccountError(t('logoutError'));
+      }
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
   return (
     <div className={styles.headerShell}>
       <AnnouncementBar />
-      <header className={styles.header}>
+      <header className={styles.header} data-locale={locale} dir="ltr">
         <button
           aria-controls={menuId}
           aria-expanded={isMobileMenuOpen}
@@ -84,7 +124,31 @@ export default function Header() {
         <div className={styles.actions}>
           <PendingAction label={t('search')}><SearchIcon /></PendingAction>
           <PendingAction className={styles.tryOn} label={t('virtualTryOn')}><GlassesIcon /><span>{t('virtualTryOn')}</span></PendingAction>
-          <PendingAction className={styles.account} label={t('account')}><UserIcon /></PendingAction>
+          <div className={styles.accountSwitcher}>
+            <button
+              aria-controls={authUser ? accountMenuId : undefined}
+              aria-expanded={authUser ? isAccountOpen : undefined}
+              aria-haspopup={authUser ? 'menu' : 'dialog'}
+              aria-label={authUser ? t('accountMenu') : t('account')}
+              className={`${styles.action} ${styles.account}`}
+              onClick={() => {
+                setAccountError(null);
+                if (authUser) setIsAccountOpen((open) => !open);
+                else setIsAuthenticationOpen(true);
+              }}
+              ref={accountButtonRef}
+              type="button"
+            >
+              <UserIcon />
+            </button>
+            {authUser && isAccountOpen && (
+              <div className={styles.accountMenu} id={accountMenuId} role="menu">
+                <p className={styles.accountPhone}>{authUser.phone}</p>
+                {accountError && <p aria-live="polite" className={styles.accountError}>{accountError}</p>}
+                <button disabled={isLoggingOut} onClick={handleLogout} role="menuitem" type="button">{isLoggingOut ? t('loggingOut') : t('logout')}</button>
+              </div>
+            )}
+          </div>
 
           <div className={styles.languageSwitcher}>
             <button
@@ -136,6 +200,12 @@ export default function Header() {
           <PendingAction label={t('virtualTryOn')}>{t('virtualTryOn')}</PendingAction>
         </nav>
       </div>
+      <AuthenticationModal
+        isOpen={isAuthenticationOpen}
+        onAuthenticated={(user) => { setAuthUser(user); setIsAccountOpen(false); }}
+        onClose={() => setIsAuthenticationOpen(false)}
+        returnFocusRef={accountButtonRef}
+      />
     </div>
   );
 }

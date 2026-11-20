@@ -27,7 +27,7 @@ export function CloseIcon(props: IconProps) {
 }
 
 export function GlassesIcon(props: IconProps) {
-  return <Icon {...props}><path d="M3 11h4l1 6h3l1-4h0l1 4h3l1-6h4" /><path d="M7 11a4 4 0 0 1 8 0M7 11a4 4 0 0 0 8 0" /></Icon>;
+  return <Icon {...props}><path d="M3 10.5h3.3l1.1 6.1h3.8l.8-3.2.8 3.2h3.8l1.1-6.1H21" /><path d="M6.3 10.5c.3-2 1.8-3.4 3.9-3.4s3.6 1.4 3.9 3.4M13.8 10.5c.3-2 1.8-3.4 3.9-3.4s3.6 1.4 3.9 3.4" /><path d="M10.2 10.5h3.6" /></Icon>;
 }
 
 export function UserIcon(props: IconProps) {
