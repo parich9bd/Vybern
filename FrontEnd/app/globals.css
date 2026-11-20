@@ -1,0 +1,62 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/vazirmatn/wght.css';
+
+:root {
+  --background: #090909;
+  --foreground: #f5f2eb;
+  --surface: #12110f;
+  --surface-elevated: #1a1815;
+  --accent: #c8a76b;
+  --muted: #92918c;
+  --taupe: #928575;
+  --border: #3a352e;
+  --focus: #f8f7f4;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-focus: var(--focus);
+  --font-sans: Arial, Vazirmatn, sans-serif;
+  --font-persian: Vazirmatn, Tahoma, sans-serif;
+}
+
+* { border-color: var(--border); }
+
+html { background: var(--background); }
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Vazirmatn, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+}
+
+::selection { background: var(--accent); color: var(--background); }
+
+[dir='rtl'] body {
+  font-family: Vazirmatn, Tahoma, sans-serif;
+  line-height: 1.9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

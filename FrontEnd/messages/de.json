@@ -1,0 +1,5 @@
+{
+  "Metadata": { "title": "VYBERN Eyewear", "description": "Ein durchdachtes Fundament für VYBERN Eyewear." },
+  "Home": { "eyebrow": "VYBERN EYEWEAR", "title": "Präzision in ihrer ruhigsten Form.", "body": "Ein mehrsprachiges Fundament für das nächste VYBERN-Erlebnis.", "status": "Phase 01 — Fundament", "language": "Deutsch" },
+  "Header": { "home": "VYBERN Startseite", "shop": "SHOP", "collections": "KOLLEKTIONEN", "story": "ÜBER UNS", "search": "Produkte suchen", "virtualTryOn": "VIRTUELLE ANPROBE", "account": "Mein Konto", "cart": "Warenkorb", "cartItemCount": "{count, plural, =0 {Keine Artikel im Warenkorb} one {# Artikel im Warenkorb} other {# Artikel im Warenkorb}}", "changeLanguage": "Sprache ändern", "selectLanguage": "SPRACHE AUSWÄHLEN", "openMenu": "Navigationsmenü öffnen", "closeMenu": "Navigationsmenü schließen", "mainNavigation": "Hauptnavigation", "announcements": "Shop-Ankündigungen", "announcement1": "KOSTENLOSER VERSAND AB 100 €", "announcement2": "FINDEN SIE IHRE PERFEKTE BRILLE — VYBERN", "announcement3": "BRAUCHEN SIE HILFE? UNSER SUPPORT-TEAM IST FÜR SIE DA" }
+}

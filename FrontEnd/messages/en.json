@@ -1,0 +1,5 @@
+{
+  "Metadata": { "title": "VYBERN Eyewear", "description": "A considered foundation for VYBERN Eyewear." },
+  "Home": { "eyebrow": "VYBERN EYEWEAR", "title": "A quieter kind of precision.", "body": "A multilingual foundation for the next VYBERN experience.", "status": "Phase 01 — Foundation", "language": "English" },
+  "Header": { "home": "VYBERN homepage", "shop": "SHOP", "collections": "COLLECTIONS", "story": "OUR STORY", "search": "Search products", "virtualTryOn": "VIRTUAL TRY-ON", "account": "My account", "cart": "Shopping bag", "cartItemCount": "{count, plural, =0 {No items in shopping bag} one {# item in shopping bag} other {# items in shopping bag}}", "changeLanguage": "Change language", "selectLanguage": "SELECT LANGUAGE", "openMenu": "Open navigation menu", "closeMenu": "Close navigation menu", "mainNavigation": "Main navigation", "announcements": "Store announcements", "announcement1": "COMPLIMENTARY SHIPPING ON ORDERS OVER €100", "announcement2": "DISCOVER YOUR PERFECT FRAME — VYBERN EYEWEAR", "announcement3": "NEED HELP? OUR SUPPORT TEAM IS HERE FOR YOU" }
+}
