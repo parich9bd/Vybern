@@ -49,6 +49,7 @@ FrontEnd/  Next.js storefront, design tokens, i18n and UI components
 - Reference-based VYBERN Header, announcement bar, real logo asset, mobile navigation and locale selector.
 - Customer account area with profile editing, OTP-backed sessions, order/payment history and an Iranian address book.
 - Customer avatar upload, replacement and removal. Files are content-validated JPEG, PNG or WebP assets stored outside PostgreSQL; only a server-controlled storage key is persisted.
+- Account navigation is keyboard-accessible and responsive; address validation uses inline, field-level server feedback without discarding entered values.
 
 ### Partially implemented
 

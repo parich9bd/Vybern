@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { apiUrl, AuthApiError } from '@/lib/auth-client';
+import { LocationIcon, OrdersIcon, SettingsIcon, UserIcon } from '@/components/layout/icons';
 import { deleteAddress, getAddresses, getOrder, getOrders, getPayments, getProfile, removeAvatar, saveAddress, updateProfile, uploadAvatar, type AddressInput, type CustomerAddress, type CustomerOrder, type CustomerPayment, type CustomerProfile } from '@/lib/account-client';
 import styles from './AccountArea.module.css';
 
@@ -31,7 +32,7 @@ export function AccountArea({ section, orderId }: Props) {
   }, []);
 
   const navigation = useMemo(() => [
-    ['overview', '/account', t('overview')], ['profile', '/account/profile', t('profile')], ['orders', '/account/orders', t('orders')], ['addresses', '/account/addresses', t('addresses')], ['settings', '/account/settings', t('settings')],
+    ['overview', '/account', t('overview'), <UserIcon key="overview" />], ['profile', '/account/profile', t('profile'), <UserIcon key="profile" />], ['orders', '/account/orders', t('orders'), <OrdersIcon key="orders" />], ['addresses', '/account/addresses', t('addresses'), <LocationIcon key="addresses" />], ['settings', '/account/settings', t('settings'), <SettingsIcon key="settings" />],
   ] as const, [t]);
 
   if (loading) return <main className={styles.state}><p>{t('loading')}</p></main>;
@@ -47,7 +48,7 @@ export function AccountArea({ section, orderId }: Props) {
   return <main className={styles.page} dir={locale === 'fa' ? 'rtl' : 'ltr'}>
     <aside className={styles.sidebar}>
       <div className={styles.profileSummary}>{profile.avatarUrl ? <img alt="" className={styles.avatar} src={apiUrl(profile.avatarUrl)} /> : <span className={styles.avatar}>{initials(profile)}</span>}<div><p>{profile.firstName || profile.lastName ? `${profile.firstName ?? ''} ${profile.lastName ?? ''}`.trim() : t('customer')}</p><span dir="ltr">{profile.phone}</span></div></div>
-      <nav aria-label={t('accountNavigation')} className={styles.navigation}>{navigation.map(([key, href, label]) => <Link aria-current={section === key || (section === 'order-detail' && key === 'orders') ? 'page' : undefined} className={section === key || (section === 'order-detail' && key === 'orders') ? styles.active : undefined} href={href} key={key}>{label}</Link>)}</nav>
+      <nav aria-label={t('accountNavigation')} className={styles.navigation}>{navigation.map(([key, href, label, icon]) => <Link aria-current={section === key || (section === 'order-detail' && key === 'orders') ? 'page' : undefined} className={section === key || (section === 'order-detail' && key === 'orders') ? styles.active : undefined} href={href} key={key}>{icon}<span>{label}</span></Link>)}</nav>
     </aside>
     <section className={styles.content}>{content}</section>
   </main>;
@@ -100,7 +101,7 @@ function Addresses({ profile }: { profile: CustomerProfile }) {
 
 function AddressForm({ initial, onClose, onSaved }: { initial: AddressInput & { id?: string }; onClose: () => void; onSaved: () => void }) {
   const t = useTranslations('Account'); const [input, setInput] = useState(initial); const [errors, setErrors] = useState<Record<string, string[]>>({}); const [saving, setSaving] = useState(false);
-  const field = (key: keyof AddressInput, label: string, type = 'text') => <label>{label}<input aria-invalid={Boolean(errors[key])} dir={key === 'phone' ? 'ltr' : undefined} onChange={(event) => { setInput({ ...input, [key]: event.target.value }); setErrors((current) => ({ ...current, [key]: [] })); }} type={type} value={String(input[key] ?? '')} />{errors[key]?.[0] && <small className={styles.error}>{errors[key][0]}</small>}</label>;
+  const field = (key: keyof AddressInput, label: string, type = 'text') => { const id = `address-${key}`; const errorId = `${id}-error`; const optional = key === 'addressLine2'; return <label htmlFor={id}>{label}{!optional && <b aria-hidden="true"> *</b>}<input aria-describedby={errors[key]?.[0] ? errorId : undefined} aria-invalid={Boolean(errors[key])} dir={key === 'phone' ? 'ltr' : undefined} id={id} onChange={(event) => { setInput({ ...input, [key]: event.target.value }); setErrors((current) => ({ ...current, [key]: [] })); }} required={!optional} type={type} value={String(input[key] ?? '')} />{errors[key]?.[0] && <small className={styles.error} id={errorId} role="alert">{errors[key][0]}</small>}</label>; };
   const submit = async (event: React.FormEvent) => { event.preventDefault(); if (saving) return; setSaving(true); setErrors({}); try { await saveAddress(input, initial.id); onSaved(); } catch (cause) { setErrors(cause instanceof AuthApiError ? cause.fieldErrors : {}); if (!(cause instanceof AuthApiError) || !Object.keys(cause.fieldErrors).length) setErrors({ form: [t('saveError')] }); } finally { setSaving(false); } };
   return <div className={styles.formPanel}><h2>{initial.id ? t('editAddress') : t('addAddress')}</h2><form className={styles.form} onSubmit={submit}><div className={styles.grid}>{field('firstName', t('firstName'))}{field('lastName', t('lastName'))}{field('phone', t('phone'), 'tel')}{field('postalCode', t('postalCode'))}</div>{field('addressLine1', t('streetAddress'))}{field('addressLine2', t('unitOptional'))}<div className={styles.grid}>{field('province', t('province'))}{field('city', t('city'))}</div><label className={styles.check}><input checked={Boolean(input.isDefault)} onChange={(event) => setInput({ ...input, isDefault: event.target.checked })} type="checkbox" />{t('setDefault')}</label>{errors.form?.[0] && <p className={styles.error}>{errors.form[0]}</p>}<div className={styles.inlineActions}><button disabled={saving} type="submit">{saving ? t('saving') : t('saveAddress')}</button><button disabled={saving} onClick={onClose} type="button">{t('cancel')}</button></div></form></div>;
 }
