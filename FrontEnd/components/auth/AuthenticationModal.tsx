@@ -36,6 +36,7 @@ function getErrorKey(error: unknown): string {
 
 export function AuthenticationModal({ isOpen, onAuthenticated, onClose, returnFocusRef }: AuthenticationModalProps) {
   const t = useTranslations('Authentication');
+  const cooldownT = useTranslations('Otp');
   const locale = useLocale();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const phoneInputRef = useRef<HTMLInputElement>(null);
@@ -47,6 +48,17 @@ export function AuthenticationModal({ isOpen, onAuthenticated, onClose, returnFo
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cooldownUntil, setCooldownUntil] = useState<number | null>(null);
+  const [now, setNow] = useState(0);
+  const cooldownSeconds = cooldownUntil ? Math.max(0, Math.ceil((cooldownUntil - now) / 1000)) : 0;
+
+  useEffect(() => {
+    if (!cooldownUntil) return;
+    const timer = window.setInterval(() => setNow(Date.now()), 250);
+    return () => window.clearInterval(timer);
+  }, [cooldownUntil]);
+
+  const applyCooldown = (seconds: number) => { setNow(Date.now()); setCooldownUntil(Date.now() + seconds * 1000); };
 
   const close = () => {
     dialogRef.current?.close();
@@ -118,11 +130,13 @@ export function AuthenticationModal({ isOpen, onAuthenticated, onClose, returnFo
     setError(null);
     setIsSubmitting(true);
     try {
-      await requestOtp(normalisedPhone);
+      const cooldown = await requestOtp(normalisedPhone);
+      applyCooldown(cooldown);
       setPhone(normalisedPhone);
       setStep('otp');
       window.setTimeout(() => otpInputRefs.current[0]?.focus(), 0);
     } catch (requestError) {
+      if (requestError instanceof AuthApiError && requestError.status === 429) applyCooldown(requestError.retryAfterSeconds ?? 60);
       setError(t(getErrorKey(requestError)));
     } finally {
       setIsSubmitting(false);
@@ -177,10 +191,12 @@ export function AuthenticationModal({ isOpen, onAuthenticated, onClose, returnFo
     setError(null);
     setIsSubmitting(true);
     try {
-      await requestOtp(phone);
+      const cooldown = await requestOtp(phone);
+      applyCooldown(cooldown);
       setOtp(Array(6).fill(''));
       otpInputRefs.current[0]?.focus();
     } catch (requestError) {
+      if (requestError instanceof AuthApiError && requestError.status === 429) applyCooldown(requestError.retryAfterSeconds ?? 60);
       setError(t(getErrorKey(requestError)));
     } finally {
       setIsSubmitting(false);
@@ -201,7 +217,8 @@ export function AuthenticationModal({ isOpen, onAuthenticated, onClose, returnFo
             <input aria-describedby="auth-phone-hint auth-error" autoComplete="tel" className={styles.phoneInput} disabled={isSubmitting} id="auth-phone" inputMode="tel" onChange={(event) => setPhone(event.target.value)} placeholder={t('phonePlaceholder')} ref={phoneInputRef} type="tel" value={phone} />
             <p className={styles.hint} id="auth-phone-hint">{t('phoneHint')}</p>
             {error && <p aria-live="polite" className={styles.error} id="auth-error">{error}</p>}
-            <button className={styles.primaryButton} disabled={isSubmitting} type="submit">{isSubmitting ? t('sending') : t('continue')}</button>
+            {cooldownSeconds > 0 && <p aria-live="polite" className={styles.cooldown}>{cooldownT('retryIn', { seconds: cooldownSeconds })}</p>}
+            <button className={styles.primaryButton} disabled={isSubmitting || cooldownSeconds > 0} type="submit">{isSubmitting ? t('sending') : t('continue')}</button>
             <p className={styles.legal}>{t('legal')}</p>
           </form>
         ) : (
@@ -215,7 +232,7 @@ export function AuthenticationModal({ isOpen, onAuthenticated, onClose, returnFo
             <button className={styles.primaryButton} disabled={isSubmitting} type="submit">{isSubmitting ? t('verifying') : t('verify')}</button>
             <div className={styles.otpActions}>
               <button className={styles.textButton} disabled={isSubmitting} onClick={() => { setStep('phone'); setOtp(Array(6).fill('')); setError(null); }} type="button">{t('changeNumber')}</button>
-              <button className={styles.textButton} disabled={isSubmitting} onClick={resendOtp} type="button">{t('resend')}</button>
+              <button className={styles.textButton} disabled={isSubmitting || cooldownSeconds > 0} onClick={resendOtp} type="button">{cooldownSeconds > 0 ? cooldownT('retryIn', { seconds: cooldownSeconds }) : t('resend')}</button>
             </div>
           </form>
         )}

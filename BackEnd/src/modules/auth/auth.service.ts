@@ -34,13 +34,13 @@ export class AuthService {
   private async consumeRateLimit(rateKey: string, limit: number): Promise<void> {
     const count = await this.store.increment(rateKey);
     if (count === 1) await this.store.expire(rateKey, this.environment.OTP_RATE_LIMIT_WINDOW_SECONDS);
-    if (count > limit) throw new AppError(429, 'OTP_RATE_LIMITED', 'Please try again later');
+    if (count > limit) throw new AppError(429, 'OTP_RATE_LIMITED', 'Please try again later', Math.max(1, await this.store.ttl?.(rateKey) ?? this.environment.OTP_RATE_LIMIT_WINDOW_SECONDS));
   }
 
-  async requestOtp(phone: string, context: RequestContext): Promise<{ developmentOtp?: string }> {
+  async requestOtp(phone: string, context: RequestContext): Promise<{ developmentOtp?: string; cooldownSeconds: number }> {
+    if (await this.store.get(key.cooldown(phone))) throw new AppError(429, 'OTP_RESEND_COOLDOWN', 'Please wait before requesting another code', Math.max(1, await this.store.ttl?.(key.cooldown(phone)) ?? this.environment.OTP_RESEND_COOLDOWN_SECONDS));
     await this.consumeRateLimit(key.ipRate(context.ip), this.environment.OTP_REQUEST_LIMIT_PER_IP);
     await this.consumeRateLimit(key.phoneRate(phone), this.environment.OTP_REQUEST_LIMIT_PER_PHONE);
-    if (await this.store.get(key.cooldown(phone))) throw new AppError(429, 'OTP_RESEND_COOLDOWN', 'Please wait before requesting another code');
 
     const code = randomInt(0, 1_000_000).toString().padStart(6, '0');
     const delivery = await this.sms.deliverOtp(phone, code).catch(() => {
@@ -53,7 +53,7 @@ export class AuthService {
     };
     await this.store.set(key.challenge(phone), JSON.stringify(challenge), { expiresInSeconds: this.environment.OTP_TTL_SECONDS });
     await this.store.set(key.cooldown(phone), '1', { expiresInSeconds: this.environment.OTP_RESEND_COOLDOWN_SECONDS });
-    return this.environment.NODE_ENV === 'development' ? { developmentOtp: delivery.developmentCode } : {};
+    return { cooldownSeconds: this.environment.OTP_RESEND_COOLDOWN_SECONDS, ...(this.environment.NODE_ENV === 'development' ? { developmentOtp: delivery.developmentCode } : {}) };
   }
 
   async verifyOtp(phone: string, code: string, context: RequestContext): Promise<{ token: string; csrfToken: string; user: User; expiresAt: Date }> {

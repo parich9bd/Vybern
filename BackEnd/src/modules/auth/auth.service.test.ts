@@ -57,6 +57,14 @@ describe('phone OTP authentication', () => {
     await expect(service.requestOtp('+447700900123', { ip: '127.0.0.1' })).rejects.toMatchObject({ code: 'OTP_RESEND_COOLDOWN' });
   });
 
+  it('does not consume rate-limit quota for requests rejected by the resend cooldown', async () => {
+    const { store, prisma, sms } = dependencies();
+    const limited = { ...environment, OTP_REQUEST_LIMIT_PER_PHONE: 1 };
+    const service = new AuthService(prisma, store, sms, limited);
+    await service.requestOtp('+447700900123', { ip: '127.0.0.1' });
+    await expect(service.requestOtp('+447700900123', { ip: '127.0.0.1' })).rejects.toMatchObject({ code: 'OTP_RESEND_COOLDOWN' });
+  });
+
   it('rejects an expired code even if a Redis key outlives its TTL', async () => {
     const { store, prisma, sms } = dependencies();
     let clock = new Date('2026-01-01T00:00:00.000Z');

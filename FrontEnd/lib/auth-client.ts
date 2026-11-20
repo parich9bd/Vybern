@@ -12,7 +12,7 @@ type ApiErrorPayload = Readonly<{
 }>;
 
 export class AuthApiError extends Error {
-  constructor(public readonly code: string, message: string, public readonly status: number, public readonly fieldErrors: Record<string, string[]> = {}) {
+  constructor(public readonly code: string, message: string, public readonly status: number, public readonly fieldErrors: Record<string, string[]> = {}, public readonly retryAfterSeconds?: number) {
     super(message);
     this.name = 'AuthApiError';
   }
@@ -37,7 +37,8 @@ export async function authenticatedRequest<T>(path: string, init: RequestInit = 
 
   const payload = (await response.json().catch(() => ({}))) as ApiErrorPayload & T;
   if (!response.ok) {
-    throw new AuthApiError(payload.error?.code ?? 'REQUEST_FAILED', payload.error?.message ?? 'Authentication request failed', response.status, payload.error?.details?.fieldErrors ?? {});
+    const retryAfter = Number(response.headers.get('retry-after'));
+    throw new AuthApiError(payload.error?.code ?? 'REQUEST_FAILED', payload.error?.message ?? 'Authentication request failed', response.status, payload.error?.details?.fieldErrors ?? {}, Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter : undefined);
   }
 
   return payload as T;
@@ -51,11 +52,12 @@ export function isE164PhoneNumber(value: string): boolean {
   return /^\+[1-9]\d{7,14}$/.test(normalisePhoneNumber(value));
 }
 
-export async function requestOtp(phone: string): Promise<void> {
-  await authenticatedRequest('/auth/otp/request', {
+export async function requestOtp(phone: string): Promise<number> {
+  const payload = await authenticatedRequest<{ data: { cooldownSeconds: number } }>('/auth/otp/request', {
     method: 'POST',
     body: JSON.stringify({ phone: normalisePhoneNumber(phone) }),
   });
+  return payload.data.cooldownSeconds;
 }
 
 export async function verifyOtp(phone: string, code: string): Promise<AuthUser> {

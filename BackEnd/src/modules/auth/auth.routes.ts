@@ -48,8 +48,13 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
     const { phone: rawPhone } = otpRequestSchema.parse(request.body);
     let phone: string;
     try { phone = normaliseE164Phone(rawPhone); } catch { throw new AppError(400, 'VALIDATION_ERROR', 'Phone number must be in E.164 format'); }
-    const result = await service.requestOtp(phone, requestContext(request));
-    return reply.status(202).send({ data: { accepted: true, ...(result.developmentOtp ? { developmentOtp: result.developmentOtp } : {}) } });
+    try {
+      const result = await service.requestOtp(phone, requestContext(request));
+      return reply.status(202).send({ data: { accepted: true, cooldownSeconds: result.cooldownSeconds, ...(result.developmentOtp ? { developmentOtp: result.developmentOtp } : {}) } });
+    } catch (error) {
+      if (error instanceof AppError && error.statusCode === 429 && error.retryAfterSeconds) reply.header('retry-after', String(error.retryAfterSeconds));
+      throw error;
+    }
   });
 
   app.post('/auth/otp/verify', {

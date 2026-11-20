@@ -100,7 +100,7 @@ describe('Fastify route schemas', () => {
     applications.push(app);
     const response = await app.inject({ method: 'POST', url: '/api/v1/auth/otp/request', payload: { phone: '+447700900123' } });
     expect(response.statusCode).toBe(202);
-    expect(response.json()).toEqual({ data: { accepted: true } });
+    expect(response.json()).toEqual({ data: { accepted: true, cooldownSeconds: 60 } });
   });
 
   it('returns a safe 400 response for Fastify schema validation failures', async () => {

@@ -1,5 +1,6 @@
 {
   "Metadata": { "title": "VYBERN Eyewear", "description": "Ein durchdachtes Fundament für VYBERN Eyewear." },
+  "Otp": { "retryIn": "Erneut versuchen in {seconds}s" },
   "Payment": { "status": "Zahlung: {status}", "PENDING": "Ausstehend", "SUCCEEDED": "Bezahlt", "FAILED": "Fehlgeschlagen", "CANCELLED": "Storniert", "EXPIRED": "Abgelaufen" },
   "Avatar": { "upload": "Foto hochladen", "uploading": "Wird hochgeladen…", "remove": "Foto entfernen", "error": "Ihr Foto konnte nicht aktualisiert werden." },
   "Home": { "eyebrow": "VYBERN EYEWEAR", "title": "Präzision in ihrer ruhigsten Form.", "body": "Ein mehrsprachiges Fundament für das nächste VYBERN-Erlebnis.", "status": "Phase 01 — Fundament", "language": "Deutsch" },

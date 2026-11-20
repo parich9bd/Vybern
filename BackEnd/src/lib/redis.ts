@@ -8,6 +8,7 @@ export interface KeyValueStore {
   del(key: string): Promise<number>;
   increment(key: string): Promise<number>;
   expire(key: string, seconds: number): Promise<void>;
+  ttl?(key: string): Promise<number>;
   close(): Promise<void>;
 }
 
@@ -28,6 +29,7 @@ export function createRedisStore(url: string): KeyValueStore {
     async del(key) { return client.del(key); },
     async increment(key) { return client.incr(key); },
     async expire(key, seconds) { await client.expire(key, seconds); },
+    async ttl(key) { return client.ttl(key); },
     async close() { if (client.isOpen) await client.quit(); },
   };
 }
