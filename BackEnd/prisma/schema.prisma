@@ -87,6 +87,9 @@ model User {
   phone     String     @unique @db.VarChar(16)
   firstName String?    @db.VarChar(100)
   lastName  String?    @db.VarChar(100)
+  avatarKey String?    @db.VarChar(128)
+  avatarContentType String? @db.VarChar(32)
+  avatarUpdatedAt DateTime?
   role      UserRole   @default(CUSTOMER)
   status    UserStatus @default(ACTIVE)
   sessions  Session[]

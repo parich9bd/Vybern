@@ -181,14 +181,15 @@
   z-index: 30;
   display: grid;
   gap: 0.75rem;
-  inline-size: 14rem;
+  inline-size: 15.5rem;
   padding: 1rem;
   border: 1px solid rgb(200 167 107 / 25%);
   background: var(--surface-elevated);
   box-shadow: 0 1rem 2.5rem rgb(0 0 0 / 35%);
 }
 
-.accountPhone { overflow: hidden; margin: 0; color: var(--foreground); font-size: 0.72rem; letter-spacing: 0.04em; text-overflow: ellipsis; white-space: nowrap; }
+.accountIdentity { display:flex; align-items:center; gap:.65rem; padding-block-end:.85rem; border-block-end:1px solid var(--border); }.accountIdentity>span,.accountIdentity>img { display:grid; place-items:center; inline-size:2rem; block-size:2rem; border:1px solid rgb(200 167 107 / 48%); border-radius:50%; color:var(--accent); font:400 .8rem var(--font-editorial); object-fit:cover; }.accountIdentity p { display:grid; gap:.18rem; min-inline-size:0; margin:0; }.accountIdentity strong { overflow:hidden; color:var(--foreground); font:400 .92rem var(--font-editorial); text-overflow:ellipsis; white-space:nowrap; }.accountIdentity small { overflow:hidden; color:var(--muted); font-size:.65rem; text-overflow:ellipsis; white-space:nowrap; }
+.accountLinks { display:grid; }.accountLinks a { padding:.5rem 0; color:rgb(245 242 235 / 80%); font:600 .62rem var(--font-navigation); letter-spacing:.09em; text-decoration:none; text-transform:uppercase; }.accountLinks a:hover,.accountLinks a:focus-visible { color:var(--accent); }
 .accountMenu button { min-block-size: 2.5rem; border: 1px solid rgb(200 167 107 / 42%); background: transparent; color: var(--foreground); cursor: pointer; font: 600 0.65rem var(--font-navigation); letter-spacing: 0.1em; text-transform: uppercase; }
 .accountMenu button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
 .accountError { margin: 0; color: #e8a4a0; font-size: 0.72rem; line-height: 1.5; }
@@ -236,3 +237,5 @@
   .mobileNavigationOpen,
   .languageTrigger svg:last-child { transition: none; }
 }
+
+.accountLinks a{display:flex;align-items:center;gap:.45rem}.accountLinks svg,.accountMenu button svg{inline-size:.9rem;block-size:.9rem}.accountMenu button{display:flex;align-items:center;justify-content:center;gap:.45rem}

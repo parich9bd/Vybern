@@ -6,9 +6,9 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import type { Locale } from '@/i18n/routing';
 import { AuthenticationModal } from '@/components/auth/AuthenticationModal';
-import { AuthApiError, getCurrentUser, logout, type AuthUser } from '@/lib/auth-client';
+import { apiUrl, AuthApiError, getCurrentUser, logout, type AuthUser } from '@/lib/auth-client';
 import { AnnouncementBar } from './AnnouncementBar';
-import { BagIcon, CheckIcon, ChevronIcon, CloseIcon, GlassesIcon, LanguagesIcon, MenuIcon, SearchIcon, UserIcon } from './icons';
+import { BagIcon, CheckIcon, ChevronIcon, CloseIcon, GlassesIcon, LanguagesIcon, LocationIcon, LogoutIcon, MenuIcon, OrdersIcon, SearchIcon, SettingsIcon, UserIcon } from './icons';
 import styles from './Header.module.css';
 
 const languages: ReadonlyArray<{ code: Locale; label: string; native: string }> = [
@@ -33,6 +33,7 @@ function PendingAction({ label, children, className }: PendingActionProps) {
 
 export default function Header() {
   const t = useTranslations('Header');
+  const accountT = useTranslations('Account');
   const locale = useLocale() as Locale;
   const pathname = usePathname();
   const router = useRouter();
@@ -44,6 +45,8 @@ export default function Header() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [accountError, setAccountError] = useState<string | null>(null);
   const accountButtonRef = useRef<HTMLButtonElement>(null);
+  const accountSwitcherRef = useRef<HTMLDivElement>(null);
+  const accountCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const menuId = useId();
   const languageMenuId = useId();
   const accountMenuId = useId();
@@ -59,6 +62,25 @@ export default function Header() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  useEffect(() => () => { if (accountCloseTimer.current) clearTimeout(accountCloseTimer.current); }, []);
+
+  const keepAccountOpen = () => {
+    if (accountCloseTimer.current) clearTimeout(accountCloseTimer.current);
+    if (authUser) setIsAccountOpen(true);
+  };
+  const closeAccountSoon = () => {
+    if (accountCloseTimer.current) clearTimeout(accountCloseTimer.current);
+    accountCloseTimer.current = setTimeout(() => setIsAccountOpen(false), 180);
+  };
+
+  useEffect(() => {
+    const closeOnOutsideClick = (event: MouseEvent) => {
+      if (!accountSwitcherRef.current?.contains(event.target as Node)) setIsAccountOpen(false);
+    };
+    document.addEventListener('mousedown', closeOnOutsideClick);
+    return () => document.removeEventListener('mousedown', closeOnOutsideClick);
   }, []);
 
   useEffect(() => {
@@ -96,6 +118,8 @@ export default function Header() {
     }
   };
 
+  const accountName = authUser?.firstName || authUser?.lastName ? `${authUser.firstName ?? ''} ${authUser.lastName ?? ''}`.trim() : accountT('customer');
+
   return (
     <div className={styles.headerShell}>
       <AnnouncementBar />
@@ -124,7 +148,7 @@ export default function Header() {
         <div className={styles.actions}>
           <PendingAction label={t('search')}><SearchIcon /></PendingAction>
           <PendingAction className={styles.tryOn} label={t('virtualTryOn')}><GlassesIcon /><span>{t('virtualTryOn')}</span></PendingAction>
-          <div className={styles.accountSwitcher}>
+          <div className={styles.accountSwitcher} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setIsAccountOpen(false); }} onPointerEnter={keepAccountOpen} onPointerLeave={(event) => { if (event.pointerType === 'mouse') closeAccountSoon(); }} ref={accountSwitcherRef}>
             <button
               aria-controls={authUser ? accountMenuId : undefined}
               aria-expanded={authUser ? isAccountOpen : undefined}
@@ -136,6 +160,7 @@ export default function Header() {
                 if (authUser) setIsAccountOpen((open) => !open);
                 else setIsAuthenticationOpen(true);
               }}
+              onFocus={keepAccountOpen}
               ref={accountButtonRef}
               type="button"
             >
@@ -143,9 +168,15 @@ export default function Header() {
             </button>
             {authUser && isAccountOpen && (
               <div className={styles.accountMenu} id={accountMenuId} role="menu">
-                <p className={styles.accountPhone}>{authUser.phone}</p>
+                <div className={styles.accountIdentity}>{authUser.avatarUrl ? <img alt="" src={apiUrl(authUser.avatarUrl)} /> : <span>{accountName.slice(0, 2).toUpperCase()}</span>}<p><strong>{accountName}</strong><small dir="ltr">{authUser.phone}</small></p></div>
                 {accountError && <p aria-live="polite" className={styles.accountError}>{accountError}</p>}
-                <button disabled={isLoggingOut} onClick={handleLogout} role="menuitem" type="button">{isLoggingOut ? t('loggingOut') : t('logout')}</button>
+                <div className={styles.accountLinks}>
+                  <Link onClick={() => setIsAccountOpen(false)} role="menuitem" href="/account/profile"><UserIcon />{accountT('profile')}</Link>
+                  <Link onClick={() => setIsAccountOpen(false)} role="menuitem" href="/account/orders"><OrdersIcon />{accountT('orders')}</Link>
+                  <Link onClick={() => setIsAccountOpen(false)} role="menuitem" href="/account/addresses"><LocationIcon />{accountT('addresses')}</Link>
+                  <Link onClick={() => setIsAccountOpen(false)} role="menuitem" href="/account/settings"><SettingsIcon />{accountT('settings')}</Link>
+                </div>
+                <button disabled={isLoggingOut} onClick={handleLogout} role="menuitem" type="button"><LogoutIcon />{isLoggingOut ? t('loggingOut') : t('logout')}</button>
               </div>
             )}
           </div>

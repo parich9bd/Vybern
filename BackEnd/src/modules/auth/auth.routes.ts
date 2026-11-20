@@ -8,14 +8,14 @@ const errorResponse = {
   type: 'object', required: ['error'], additionalProperties: false,
   properties: { error: { type: 'object', required: ['code', 'message'], additionalProperties: true, properties: { code: { type: 'string' }, message: { type: 'string' }, details: { type: 'object', additionalProperties: true } } } },
 } as const;
-const userSchema = { type: 'object', required: ['id', 'phone', 'firstName', 'lastName', 'role'], additionalProperties: false, properties: { id: { type: 'string' }, phone: { type: 'string' }, firstName: { type: ['string', 'null'] }, lastName: { type: ['string', 'null'] }, role: { type: 'string' } } } as const;
+const userSchema = { type: 'object', required: ['id', 'phone', 'firstName', 'lastName', 'role', 'avatarUrl'], additionalProperties: false, properties: { id: { type: 'string' }, phone: { type: 'string' }, firstName: { type: ['string', 'null'] }, lastName: { type: ['string', 'null'] }, role: { type: 'string' }, avatarUrl: { type: ['string', 'null'] } } } as const;
 
 function requestContext(request: FastifyRequest) {
   return { ip: request.ip, userAgent: request.headers['user-agent'] };
 }
 
-function serialiseUser(user: { id: string; phone: string; firstName: string | null; lastName: string | null; role: string }) {
-  return { id: user.id, phone: user.phone, firstName: user.firstName, lastName: user.lastName, role: user.role };
+function serialiseUser(user: { id: string; phone: string; firstName: string | null; lastName: string | null; role: string; avatarKey: string | null; avatarUpdatedAt: Date | null }) {
+  return { id: user.id, phone: user.phone, firstName: user.firstName, lastName: user.lastName, role: user.role, avatarUrl: user.avatarKey && user.avatarUpdatedAt ? `/api/v1/account/avatar?v=${user.avatarUpdatedAt.getTime()}` : null };
 }
 
 export async function authRoutes(app: FastifyInstance): Promise<void> {

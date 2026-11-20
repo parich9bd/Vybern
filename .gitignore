@@ -4,6 +4,7 @@
 
 # Local credentials and session artifacts
 **/cookies.txt
+**/private/
 
 # Next.js
 **/.next/

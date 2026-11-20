@@ -5,13 +5,14 @@ import { AppError } from '../../lib/errors.js';
 
 export interface MediaStorage {
   createKey(extension: 'jpg' | 'png' | 'webp'): string;
+  createAvatarKey(extension: 'jpg' | 'png' | 'webp'): string;
   put(key: string, contents: Buffer): Promise<void>;
   read(key: string): Promise<Buffer>;
   remove(key: string): Promise<void>;
 }
 
 function validKey(key: string): boolean {
-  return /^images\/[a-f0-9-]{36}\.(jpg|png|webp)$/.test(key);
+  return /^(images|avatars)\/[a-f0-9-]{36}\.(jpg|png|webp)$/.test(key);
 }
 
 export class LocalMediaStorage implements MediaStorage {
@@ -21,6 +22,10 @@ export class LocalMediaStorage implements MediaStorage {
 
   createKey(extension: 'jpg' | 'png' | 'webp'): string {
     return `images/${randomUUID()}.${extension}`;
+  }
+
+  createAvatarKey(extension: 'jpg' | 'png' | 'webp'): string {
+    return `avatars/${randomUUID()}.${extension}`;
   }
 
   private pathFor(key: string): string {

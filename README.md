@@ -47,6 +47,8 @@ FrontEnd/  Next.js storefront, design tokens, i18n and UI components
 - Persian RTL document direction and local Vazirmatn font loading.
 - Semantic frontend design tokens, reduced-motion handling and locale-aware metadata.
 - Reference-based VYBERN Header, announcement bar, real logo asset, mobile navigation and locale selector.
+- Customer account area with profile editing, OTP-backed sessions, order/payment history and an Iranian address book.
+- Customer avatar upload, replacement and removal. Files are content-validated JPEG, PNG or WebP assets stored outside PostgreSQL; only a server-controlled storage key is persisted.
 
 ### Partially implemented
 
@@ -74,6 +76,8 @@ The API is served under `/api/v1`. Confirmed public endpoints include:
 
 Authentication uses OTP verification. A successful verification sets an opaque HttpOnly session cookie and provides a CSRF token. Authenticated mutations, including cart, order, payment, address and administration actions, require the session cookie and `x-csrf-token` header. Order creation also requires an `Idempotency-Key` header.
 
+Customer account endpoints include `GET/PATCH /account/profile`, `GET/POST/PATCH/DELETE /account/addresses`, `GET /orders`, `GET /orders/:orderId`, `GET /account/payments`, and `POST/GET/DELETE /account/avatar`. Avatar writes require CSRF protection; the avatar content endpoint only serves the authenticated owner.
+
 Run the backend locally to access Swagger UI at `http://localhost:3001/docs` for the complete, generated contract.
 
 ## Local development
@@ -98,6 +102,14 @@ npm run prisma:generate
 npm run prisma:deploy
 npm run prisma:seed
 npm run dev
+```
+
+`MEDIA_STORAGE_PATH` controls local avatar and product-media storage, and `MEDIA_MAX_FILE_SIZE_BYTES` limits uploads. The storage directory is runtime data and must remain outside version control. For production, use durable shared/object storage behind the same storage interface: local filesystem storage is suitable only for a single persistent instance, not serverless or multi-instance deployments.
+
+Apply checked-in migrations without resetting data:
+
+```bash
+npm run prisma:deploy
 ```
 
 The backend runs at `http://localhost:3001`. PostgreSQL is exposed locally on port `5433`; Redis is exposed on `6379` by the supplied Compose configuration.
