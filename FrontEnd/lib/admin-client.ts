@@ -1,6 +1,13 @@
-import { authenticatedRequest } from './auth-client';
+import { authenticatedRequest, getCsrfToken } from './auth-client';
 
 export type AdminDashboard = { metrics: { realRevenueMinor: number; mockRevenueMinor: number; averageOrderValueMinor: number; totalOrders: number; pendingOrders: number; cancelledOrders: number; totalCustomers: number; activeProducts: number; lowStockProducts: number }; recentOrders: Array<{ id: string; status: string; total: { amountMinor: number; currency: string }; createdAt: string; customer: { firstName: string | null; lastName: string | null } }>; topSellingProducts: Array<{ productId: string | null; name: string; quantity: number }>; revenueTrends: { real: Array<{ date: string; amountMinor: number }>; mock: Array<{ date: string; amountMinor: number }> }; orderTrends: Array<{ date: string; count: number }>; orderStatusDistribution: Array<{ status: string; count: number }>; inventoryHealth: { healthy: number; low: number; out: number } };
 
 export async function getAdminDashboard(days = 30): Promise<AdminDashboard> { const from = new Date(Date.now() - days * 86_400_000).toISOString(); return (await authenticatedRequest<{ data: AdminDashboard }>(`/admin/dashboard?from=${encodeURIComponent(from)}`)).data; }
 export async function getAdminMe(): Promise<{ id: string; firstName: string | null; lastName: string | null; role: string }> { return (await authenticatedRequest<{ data: { id: string; firstName: string | null; lastName: string | null; role: string } }>('/admin/me')).data; }
+
+export type AdminCategory = { id: string; slug: string; translations: Array<{ locale: string; name: string }> };
+export type ProductInput = { slug: string; sku: string; categoryId: string; basePriceMinor: number; currency: string; translations: Array<{ locale: 'en' | 'fa' | 'de'; name: string; description?: string }> };
+function csrfHeaders() { const token = getCsrfToken(); if (!token) throw new Error('CSRF token is unavailable'); return { 'x-csrf-token': token }; }
+export async function getAdminCategories(): Promise<AdminCategory[]> { return (await authenticatedRequest<{ data: AdminCategory[] }>('/admin/categories')).data; }
+export async function createAdminProduct(input: ProductInput): Promise<{ id: string }> { return (await authenticatedRequest<{ data: { id: string } }>('/admin/products', { method: 'POST', headers: csrfHeaders(), body: JSON.stringify(input) })).data; }
+export async function setAdminProductStatus(id: string, action: 'publish' | 'unpublish' | 'archive'): Promise<void> { await authenticatedRequest(`/admin/products/${id}/${action}`, { method: 'POST', headers: csrfHeaders() }); }
