@@ -48,7 +48,9 @@ export default function Header() {
   const [accountError, setAccountError] = useState<string | null>(null);
   const accountButtonRef = useRef<HTMLButtonElement>(null);
   const accountSwitcherRef = useRef<HTMLDivElement>(null);
+  const languageSwitcherRef = useRef<HTMLDivElement>(null);
   const accountCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const languageCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const menuId = useId();
   const languageMenuId = useId();
   const accountMenuId = useId();
@@ -67,7 +69,7 @@ export default function Header() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  useEffect(() => () => { if (accountCloseTimer.current) clearTimeout(accountCloseTimer.current); }, []);
+  useEffect(() => () => { if (accountCloseTimer.current) clearTimeout(accountCloseTimer.current); if (languageCloseTimer.current) clearTimeout(languageCloseTimer.current); }, []);
 
   useEffect(() => {
     document.body.classList.toggle('modalOpen', isMobileMenuOpen);
@@ -82,10 +84,13 @@ export default function Header() {
     if (accountCloseTimer.current) clearTimeout(accountCloseTimer.current);
     accountCloseTimer.current = setTimeout(() => setIsAccountOpen(false), 180);
   };
+  const keepLanguageOpen = () => { if (languageCloseTimer.current) clearTimeout(languageCloseTimer.current); setIsLanguageOpen(true); };
+  const closeLanguageSoon = (pointerType?: string) => { if (pointerType && pointerType !== 'mouse') return; if (languageCloseTimer.current) clearTimeout(languageCloseTimer.current); languageCloseTimer.current = setTimeout(() => setIsLanguageOpen(false), 180); };
 
   useEffect(() => {
     const closeOnOutsideClick = (event: MouseEvent) => {
       if (!accountSwitcherRef.current?.contains(event.target as Node)) setIsAccountOpen(false);
+      if (!languageSwitcherRef.current?.contains(event.target as Node)) setIsLanguageOpen(false);
     };
     document.addEventListener('mousedown', closeOnOutsideClick);
     return () => document.removeEventListener('mousedown', closeOnOutsideClick);
@@ -99,6 +104,13 @@ export default function Header() {
       if (isMounted) setAuthUser(null);
     });
     return () => { isMounted = false; };
+  }, []);
+
+  useEffect(() => {
+    try {
+      const flow = JSON.parse(window.sessionStorage.getItem('vybern-auth-flow') ?? 'null') as { step?: string; savedAt?: number } | null;
+      if (flow?.step === 'otp' && typeof flow.savedAt === 'number' && Date.now() - flow.savedAt < 15 * 60_000) window.setTimeout(() => setIsAuthenticationOpen(true), 0);
+    } catch { /* A malformed local entry must not affect navigation. */ }
   }, []);
 
   const changeLocale = (nextLocale: Locale) => {
@@ -193,7 +205,7 @@ export default function Header() {
             )}
           </div>
 
-          <div className={styles.languageSwitcher}>
+          <div className={styles.languageSwitcher} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setIsLanguageOpen(false); }} onPointerEnter={keepLanguageOpen} onPointerLeave={(event) => closeLanguageSoon(event.pointerType)} ref={languageSwitcherRef}>
             <button
               aria-controls={languageMenuId}
               aria-expanded={isLanguageOpen}
@@ -201,6 +213,7 @@ export default function Header() {
               aria-label={t('changeLanguage')}
               className={styles.languageTrigger}
               onClick={() => setIsLanguageOpen((open) => !open)}
+              onFocus={keepLanguageOpen}
               type="button"
             >
               <LanguagesIcon />

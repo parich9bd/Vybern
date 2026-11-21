@@ -26,5 +26,6 @@
 .textButton:hover:not(:disabled) { color: var(--accent); }
 .panel[dir='rtl'] .brand { letter-spacing: 0; }
 .panel[dir='rtl'] .label { letter-spacing: 0; text-transform: none; }
+.panel[dir='rtl'] { font-family:var(--font-persian); }.panel[dir='rtl'] h2{font-family:var(--font-persian);}
 @media (max-width: 420px) { .dialog { inline-size: calc(100% - 1rem); max-block-size: calc(100dvh - 1rem - env(safe-area-inset-top) - env(safe-area-inset-bottom)); } .panel { padding: 2.25rem 1.25rem; } .otpGroup { gap: 0.35rem; } .otpInput { block-size: 3rem; } }
 @media (prefers-reduced-motion: reduce) { .primaryButton { transition: none; } }

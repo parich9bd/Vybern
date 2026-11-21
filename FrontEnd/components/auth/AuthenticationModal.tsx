@@ -14,6 +14,12 @@ type AuthenticationModalProps = Readonly<{
 }>;
 
 type Step = 'phone' | 'otp';
+const flowStorageKey = 'vybern-auth-flow';
+type StoredFlow = { step: Step; phone: string; cooldownUntil: number | null; savedAt: number };
+
+function readStoredFlow(): StoredFlow | null {
+  try { const value = JSON.parse(window.sessionStorage.getItem(flowStorageKey) ?? 'null') as StoredFlow | null; return value?.step === 'otp' && isE164PhoneNumber(value.phone) && typeof value.savedAt === 'number' && Date.now() - value.savedAt < 15 * 60_000 ? value : null; } catch { return null; }
+}
 
 function maskPhone(phone: string): string {
   if (phone.length < 7) return phone;
@@ -52,13 +58,25 @@ export function AuthenticationModal({ isOpen, onAuthenticated, onClose, returnFo
   const [now, setNow] = useState(0);
   const cooldownSeconds = cooldownUntil ? Math.max(0, Math.ceil((cooldownUntil - now) / 1000)) : 0;
 
+  const persistFlow = (nextStep: Step, nextPhone: string, nextCooldownUntil: number | null) => {
+    try { if (nextStep === 'otp') window.sessionStorage.setItem(flowStorageKey, JSON.stringify({ step: nextStep, phone: nextPhone, cooldownUntil: nextCooldownUntil, savedAt: Date.now() })); else window.sessionStorage.removeItem(flowStorageKey); } catch { /* Storage is optional. */ }
+  };
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const stored = readStoredFlow();
+    if (!stored) return;
+    const timer = window.setTimeout(() => { setPhone(stored.phone); setCooldownUntil(stored.cooldownUntil && stored.cooldownUntil > Date.now() ? stored.cooldownUntil : null); setNow(Date.now()); setStep('otp'); }, 0);
+    return () => window.clearTimeout(timer);
+  }, [isOpen]);
+
   useEffect(() => {
     if (!cooldownUntil) return;
     const timer = window.setInterval(() => setNow(Date.now()), 250);
     return () => window.clearInterval(timer);
   }, [cooldownUntil]);
 
-  const applyCooldown = (seconds: number) => { setNow(Date.now()); setCooldownUntil(Date.now() + seconds * 1000); };
+  const applyCooldown = (seconds: number, nextPhone = phone) => { const until = Date.now() + seconds * 1000; setNow(Date.now()); setCooldownUntil(until); persistFlow('otp', nextPhone, until); };
 
   const close = () => {
     dialogRef.current?.close();
@@ -72,6 +90,7 @@ export function AuthenticationModal({ isOpen, onAuthenticated, onClose, returnFo
     setOtp(Array(6).fill(''));
     setError(null);
     setIsSubmitting(false);
+    persistFlow('phone', '', null);
   };
 
   useEffect(() => {
@@ -131,12 +150,12 @@ export function AuthenticationModal({ isOpen, onAuthenticated, onClose, returnFo
     setIsSubmitting(true);
     try {
       const cooldown = await requestOtp(normalisedPhone);
-      applyCooldown(cooldown);
+      applyCooldown(cooldown, normalisedPhone);
       setPhone(normalisedPhone);
       setStep('otp');
       window.setTimeout(() => otpInputRefs.current[0]?.focus(), 0);
     } catch (requestError) {
-      if (requestError instanceof AuthApiError && requestError.status === 429) applyCooldown(requestError.retryAfterSeconds ?? 60);
+      if (requestError instanceof AuthApiError && requestError.status === 429) applyCooldown(requestError.retryAfterSeconds ?? 60, normalisedPhone);
       setError(t(getErrorKey(requestError)));
     } finally {
       setIsSubmitting(false);
@@ -155,6 +174,7 @@ export function AuthenticationModal({ isOpen, onAuthenticated, onClose, returnFo
     setIsSubmitting(true);
     try {
       const user = await verifyOtp(phone, code);
+      persistFlow('phone', '', null);
       onAuthenticated(user);
       reset();
       close();
@@ -196,7 +216,7 @@ export function AuthenticationModal({ isOpen, onAuthenticated, onClose, returnFo
       setOtp(Array(6).fill(''));
       otpInputRefs.current[0]?.focus();
     } catch (requestError) {
-      if (requestError instanceof AuthApiError && requestError.status === 429) applyCooldown(requestError.retryAfterSeconds ?? 60);
+      if (requestError instanceof AuthApiError && requestError.status === 429) applyCooldown(requestError.retryAfterSeconds ?? 60, phone);
       setError(t(getErrorKey(requestError)));
     } finally {
       setIsSubmitting(false);
@@ -231,7 +251,7 @@ export function AuthenticationModal({ isOpen, onAuthenticated, onClose, returnFo
             {error && <p aria-live="polite" className={styles.error} id="auth-error">{error}</p>}
             <button className={styles.primaryButton} disabled={isSubmitting} type="submit">{isSubmitting ? t('verifying') : t('verify')}</button>
             <div className={styles.otpActions}>
-              <button className={styles.textButton} disabled={isSubmitting} onClick={() => { setStep('phone'); setOtp(Array(6).fill('')); setError(null); }} type="button">{t('changeNumber')}</button>
+              <button className={styles.textButton} disabled={isSubmitting} onClick={() => { setStep('phone'); setOtp(Array(6).fill('')); setError(null); persistFlow('phone', '', null); }} type="button">{t('changeNumber')}</button>
               <button className={styles.textButton} disabled={isSubmitting || cooldownSeconds > 0} onClick={resendOtp} type="button">{cooldownSeconds > 0 ? cooldownT('retryIn', { seconds: cooldownSeconds }) : t('resend')}</button>
             </div>
           </form>
