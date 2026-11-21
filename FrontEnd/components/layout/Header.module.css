@@ -1,4 +1,4 @@
-.headerShell { position: relative; z-index: 20; }
+.headerShell { position: relative; z-index: 20; --header-stack-height:126px; }
 
 .announcement {
   display: grid;
@@ -221,6 +221,7 @@
 }
 
 @media (max-width: 920px) {
+  .headerShell { --header-stack-height:106px; }
   .header { min-block-size: 70px; padding-inline: 5%; }
   .desktopNavigation { display: none; }
   .mobileMenuButton { display: flex; justify-self: start; min-inline-size: 44px; min-block-size: 44px; }

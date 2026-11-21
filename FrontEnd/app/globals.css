@@ -20,6 +20,7 @@
   --font-navigation: "Avenir Next", "Helvetica Neue", "Segoe UI", sans-serif;
   --font-editorial: Iowan Old Style, Baskerville, "Times New Roman", serif;
   --font-ui: var(--font-navigation);
+  --header-stack-height: 126px;
 }
 
 @theme inline {
@@ -85,6 +86,8 @@ html[dir='rtl'] body {
 }
 
 body.modalOpen { overflow: hidden; }
+
+@media (max-width: 920px) { :root { --header-stack-height: 106px; } }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

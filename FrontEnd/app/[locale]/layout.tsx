@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import '../globals.css';
 import { routing } from '@/i18n/routing';
+import { ToastProvider } from '@/components/toast/ToastProvider';
 
 type LocaleLayoutProps = Readonly<{
   children: ReactNode;
@@ -40,7 +41,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     <html lang={locale} dir={direction} suppressHydrationWarning>
       <head><script dangerouslySetInnerHTML={{ __html: "try{var t=localStorage.getItem('vybern-theme');document.documentElement.dataset.theme=t==='light'||t==='dark'?t:(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark')}catch(e){document.documentElement.dataset.theme='dark'}" }} /></head>
       <body>
-        <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider messages={messages}><ToastProvider>{children}</ToastProvider></NextIntlClientProvider>
       </body>
     </html>
   );
