@@ -8,6 +8,7 @@ import type { Locale } from '@/i18n/routing';
 import { AuthenticationModal } from '@/components/auth/AuthenticationModal';
 import { apiUrl, AuthApiError, getCurrentUser, logout, type AuthUser } from '@/lib/auth-client';
 import { AnnouncementBar } from './AnnouncementBar';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { BagIcon, CheckIcon, ChevronIcon, CloseIcon, GlassesIcon, LanguagesIcon, LocationIcon, LogoutIcon, MenuIcon, OrdersIcon, SearchIcon, SettingsIcon, ShieldIcon, UserIcon } from './icons';
 import styles from './Header.module.css';
 
@@ -51,6 +52,7 @@ export default function Header() {
   const menuId = useId();
   const languageMenuId = useId();
   const accountMenuId = useId();
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -66,6 +68,11 @@ export default function Header() {
   }, []);
 
   useEffect(() => () => { if (accountCloseTimer.current) clearTimeout(accountCloseTimer.current); }, []);
+
+  useEffect(() => {
+    document.body.classList.toggle('modalOpen', isMobileMenuOpen);
+    return () => document.body.classList.remove('modalOpen');
+  }, [isMobileMenuOpen]);
 
   const keepAccountOpen = () => {
     if (accountCloseTimer.current) clearTimeout(accountCloseTimer.current);
@@ -131,6 +138,7 @@ export default function Header() {
           aria-label={isMobileMenuOpen ? t('closeMenu') : t('openMenu')}
           className={styles.mobileMenuButton}
           onClick={() => setIsMobileMenuOpen((open) => !open)}
+          ref={menuButtonRef}
           type="button"
         >
           {isMobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
@@ -147,6 +155,7 @@ export default function Header() {
         </Link>
 
         <div className={styles.actions}>
+          <ThemeToggle className={`${styles.action} ${styles.themeToggle}`} />
           <PendingAction label={t('search')}><SearchIcon /></PendingAction>
           <PendingAction className={styles.tryOn} label={t('virtualTryOn')}><GlassesIcon /><span>{t('virtualTryOn')}</span></PendingAction>
           <div className={styles.accountSwitcher} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setIsAccountOpen(false); }} onPointerEnter={keepAccountOpen} onPointerLeave={(event) => { if (event.pointerType === 'mouse') closeAccountSoon(); }} ref={accountSwitcherRef}>
@@ -166,6 +175,7 @@ export default function Header() {
               type="button"
             >
               <UserIcon />
+              <span className={styles.accountLabel}>{t('account')}</span>
             </button>
             {authUser && isAccountOpen && (
               <div className={styles.accountMenu} id={accountMenuId} role="menu">
@@ -225,14 +235,18 @@ export default function Header() {
         </div>
       </header>
 
-      <div className={isMobileMenuOpen ? styles.mobileNavigationOpen : styles.mobileNavigation} id={menuId}>
+      {isMobileMenuOpen && <div aria-hidden="true" className={styles.drawerBackdrop} onClick={() => { setIsMobileMenuOpen(false); menuButtonRef.current?.focus(); }} />}
+      <aside aria-label={t('mainNavigation')} className={isMobileMenuOpen ? styles.mobileNavigationOpen : styles.mobileNavigation} id={menuId}>
         <nav aria-label={t('mainNavigation')} className={styles.mobileNavigationContent}>
-          <PendingAction label={t('shop')}>{t('shop')}</PendingAction>
-          <PendingAction label={t('collections')}>{t('collections')}</PendingAction>
-          <PendingAction label={t('story')}>{t('story')}</PendingAction>
-          <PendingAction label={t('virtualTryOn')}>{t('virtualTryOn')}</PendingAction>
+          <PendingAction label={t('shop')}><SearchIcon />{t('shop')}</PendingAction>
+          <PendingAction label={t('collections')}><GlassesIcon />{t('collections')}</PendingAction>
+          <PendingAction label={t('story')}><UserIcon />{t('story')}</PendingAction>
+          <PendingAction label={t('virtualTryOn')}><GlassesIcon />{t('virtualTryOn')}</PendingAction>
+          <PendingAction label={t('cart')}><BagIcon />{t('cart')} <span className={styles.drawerCartCount}>0</span></PendingAction>
+          <div className={styles.drawerTheme}><span>THEME</span><ThemeToggle className={styles.action} /></div>
+          <div className={styles.drawerLanguages}>{languages.map((language) => <button aria-current={locale === language.code ? 'true' : undefined} key={language.code} onClick={() => changeLocale(language.code)} type="button">{language.label}</button>)}</div>
         </nav>
-      </div>
+      </aside>
       <AuthenticationModal
         isOpen={isAuthenticationOpen}
         onAuthenticated={(user) => { setAuthUser(user); setIsAccountOpen(false); }}

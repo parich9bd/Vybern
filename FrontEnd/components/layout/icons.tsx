@@ -40,6 +40,8 @@ export function SettingsIcon(props: IconProps) { return <Icon {...props}><circle
 export function LogoutIcon(props: IconProps) { return <Icon {...props}><path d="M10 5H5v14h5M14 8l4 4-4 4M18 12H9" /></Icon>; }
 export function DashboardIcon(props: IconProps) { return <Icon {...props}><rect x="4" y="4" width="6" height="6" /><rect x="14" y="4" width="6" height="6" /><rect x="4" y="14" width="6" height="6" /><rect x="14" y="14" width="6" height="6" /></Icon>; }
 export function ShieldIcon(props: IconProps) { return <Icon {...props}><path d="M12 3 19 6v5c0 4.6-2.8 8-7 10-4.2-2-7-5.4-7-10V6l7-3Z" /><path d="m9 12 2 2 4-4" /></Icon>; }
+export function SunIcon(props: IconProps) { return <Icon {...props}><circle cx="12" cy="12" r="3.5" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></Icon>; }
+export function MoonIcon(props: IconProps) { return <Icon {...props}><path d="M20 15.3A8.5 8.5 0 0 1 8.7 4 8.5 8.5 0 1 0 20 15.3Z" /></Icon>; }
 
 export function LanguagesIcon(props: IconProps) {
   return <Icon {...props}><path d="M5 4h8M9 4c0 7-4 10-4 10M6 9h6M13 20h6M16 13l3 7m-1.5-3.5h-3" /></Icon>;

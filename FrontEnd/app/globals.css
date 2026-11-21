@@ -1,5 +1,11 @@
 @import 'tailwindcss';
-@import '@fontsource-variable/vazirmatn/wght.css';
+@font-face {
+  font-family: 'Vazirmatn Local';
+  src: url('/fonts/vazirmatn/webfonts/Vazirmatn[wght].woff2') format('woff2');
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
 
 :root {
   --background: #090909;
@@ -25,7 +31,19 @@
   --color-border: var(--border);
   --color-focus: var(--focus);
   --font-sans: var(--font-navigation);
-  --font-persian: Vazirmatn, Tahoma, sans-serif;
+  --font-persian: 'Vazirmatn Local', Tahoma, sans-serif;
+}
+
+html[data-theme='light'] {
+  --background: #f3f0e8;
+  --foreground: #24211d;
+  --surface: #faf8f2;
+  --surface-elevated: #fffdf8;
+  --accent: #9a7135;
+  --muted: #706a60;
+  --taupe: #746858;
+  --border: #d8d0c3;
+  --focus: #493719;
 }
 
 * { border-color: var(--border); }
@@ -50,7 +68,7 @@ body {
 ::selection { background: var(--accent); color: var(--background); }
 
 [dir='rtl'] body {
-  font-family: Vazirmatn, Tahoma, sans-serif;
+  font-family: 'Vazirmatn Local', Tahoma, sans-serif;
   line-height: 1.9;
 }
 
