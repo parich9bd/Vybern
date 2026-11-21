@@ -20,6 +20,15 @@
   animation: message-flip 750ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* Persian needs a larger, non-tracked reading size than the compact Latin ticker. */
+[dir='rtl'] .announcementMessage {
+  font-family: var(--font-persian);
+  font-size: 0.78rem;
+  font-weight: 450;
+  letter-spacing: 0;
+  line-height: 1.65;
+}
+
 .header {
   position: relative;
   z-index: 1;
@@ -239,6 +248,7 @@
 @media (max-width: 520px) {
   .announcement { min-block-size: 32px; }
   .announcementMessage { font-size: 0.5rem; letter-spacing: 0.075rem; }
+  [dir='rtl'] .announcementMessage { font-size: 0.72rem; letter-spacing: 0; }
   .header { min-block-size: 66px; }
   .actions { gap: 0.625rem; }
   .languageSwitcher { display: none; }

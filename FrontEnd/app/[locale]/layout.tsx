@@ -37,7 +37,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   const direction = locale === 'fa' ? 'rtl' : 'ltr';
 
   return (
-    <html lang={locale} dir={direction}>
+    <html lang={locale} dir={direction} suppressHydrationWarning>
       <head><script dangerouslySetInnerHTML={{ __html: "try{var t=localStorage.getItem('vybern-theme');document.documentElement.dataset.theme=t==='light'||t==='dark'?t:(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark')}catch(e){document.documentElement.dataset.theme='dark'}" }} /></head>
       <body>
         <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
