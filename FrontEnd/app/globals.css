@@ -19,6 +19,7 @@
   --focus: #f8f7f4;
   --font-navigation: "Avenir Next", "Helvetica Neue", "Segoe UI", sans-serif;
   --font-editorial: Iowan Old Style, Baskerville, "Times New Roman", serif;
+  --font-ui: var(--font-navigation);
 }
 
 @theme inline {
@@ -30,7 +31,7 @@
   --color-muted: var(--muted);
   --color-border: var(--border);
   --color-focus: var(--focus);
-  --font-sans: var(--font-navigation);
+  --font-sans: var(--font-ui);
   --font-persian: 'Vazirmatn Local', Tahoma, sans-serif;
 }
 
@@ -55,7 +56,7 @@ body {
   min-width: 320px;
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-navigation);
+  font-family: var(--font-ui);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -67,8 +68,19 @@ body {
 
 ::selection { background: var(--accent); color: var(--background); }
 
-[dir='rtl'] body {
-  font-family: 'Vazirmatn Local', Tahoma, sans-serif;
+html[dir='rtl'] {
+  --font-ui: 'Vazirmatn Local', Tahoma, sans-serif;
+  --font-editorial: 'Vazirmatn Local', Tahoma, sans-serif;
+}
+
+/* Component CSS must never accidentally switch Persian UI back to a Latin face.
+   This central rule also covers dialogs and future portals rendered under body. */
+html[dir='rtl'] body,
+html[dir='rtl'] body * {
+  font-family: var(--font-ui) !important;
+}
+
+html[dir='rtl'] body {
   line-height: 1.9;
 }
 
