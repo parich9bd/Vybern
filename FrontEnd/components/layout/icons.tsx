@@ -44,7 +44,7 @@ export function SunIcon(props: IconProps) { return <Icon {...props}><circle cx="
 export function MoonIcon(props: IconProps) { return <Icon {...props}><path d="M20 15.3A8.5 8.5 0 0 1 8.7 4 8.5 8.5 0 1 0 20 15.3Z" /></Icon>; }
 
 export function LanguagesIcon(props: IconProps) {
-  return <Icon {...props}><path d="M5 4h8M9 4c0 7-4 10-4 10M6 9h6M13 20h6M16 13l3 7m-1.5-3.5h-3" /></Icon>;
+  return <Icon {...props}><circle cx="12" cy="12" r="8.5" /><path d="M3.8 12h16.4M12 3.5c2.1 2.2 3.2 5 3.2 8.5S14.1 18.3 12 20.5M12 3.5C9.9 5.7 8.8 8.5 8.8 12s1.1 6.3 3.2 8.5" /></Icon>;
 }
 
 export function ChevronIcon(props: IconProps) {
