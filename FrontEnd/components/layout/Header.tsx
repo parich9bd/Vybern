@@ -157,7 +157,7 @@ export default function Header() {
         </button>
 
         <nav aria-label={t('mainNavigation')} className={styles.desktopNavigation}>
-          <ThemeToggle className={`${styles.action} ${styles.themeToggle}`} />
+          <PendingAction label={t('shop')}>{t('shop')}</PendingAction>
           <PendingAction label={t('collections')}>{t('collections')}</PendingAction>
           <PendingAction label={t('story')}>{t('story')}</PendingAction>
         </nav>
@@ -167,7 +167,10 @@ export default function Header() {
         </Link>
 
         <div className={styles.actions}>
-          <PendingAction className={styles.shopAction} label={t('shop')}>{t('shop')}</PendingAction>
+          <PendingAction className={styles.cart} label={t('cart')}>
+            <BagIcon />
+            <span aria-label={t('cartItemCount', { count: 0 })} className={styles.cartCount}>0</span>
+          </PendingAction>
           <PendingAction label={t('search')}><SearchIcon /></PendingAction>
           <PendingAction className={styles.tryOn} label={t('virtualTryOn')}><GlassesIcon /><span>{t('virtualTryOn')}</span></PendingAction>
           <div className={styles.accountSwitcher} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setIsAccountOpen(false); }} onPointerEnter={keepAccountOpen} onPointerLeave={(event) => { if (event.pointerType === 'mouse') closeAccountSoon(); }} ref={accountSwitcherRef}>
@@ -241,10 +244,7 @@ export default function Header() {
             )}
           </div>
 
-          <PendingAction className={styles.cart} label={t('cart')}>
-            <BagIcon />
-            <span aria-label={t('cartItemCount', { count: 0 })} className={styles.cartCount}>0</span>
-          </PendingAction>
+          <ThemeToggle className={`${styles.action} ${styles.themeToggle}`} />
         </div>
       </header>
 
