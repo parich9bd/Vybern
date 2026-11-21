@@ -9,6 +9,18 @@ export async function catalogAdminRoutes(app: FastifyInstance): Promise<void> {
   const catalog = new CatalogAdminService(app.prisma);
   const audit = new AuditService(app.prisma);
 
+  app.get('/admin/categories', { schema: { tags: ['Administration'], security: [{ cookieAuth: [] }] } }, async (request) => {
+    await requireAdminPermission(app, request, 'PRODUCT_MANAGE');
+    const data = await app.prisma.category.findMany({ include: { translations: { orderBy: { locale: 'asc' } }, _count: { select: { products: true } } }, orderBy: [{ position: 'asc' }, { createdAt: 'desc' }], take: 200 });
+    return { data: data.map(({ _count, ...category }) => ({ ...category, productCount: _count.products })) };
+  });
+
+  app.get('/admin/products', { schema: { tags: ['Administration'], security: [{ cookieAuth: [] }] } }, async (request) => {
+    await requireAdminPermission(app, request, 'PRODUCT_MANAGE');
+    const data = await app.prisma.product.findMany({ include: { category: { select: { id: true, slug: true, translations: { select: { locale: true, name: true } } } }, translations: { select: { locale: true, name: true } }, variants: { select: { id: true, sku: true, stockOnHand: true, stockReserved: true, isActive: true } }, _count: { select: { images: true } } }, orderBy: { updatedAt: 'desc' }, take: 200 });
+    return { data: data.map(({ _count, ...product }) => ({ ...product, imageCount: _count.images, variants: product.variants.map((variant) => ({ ...variant, availableQuantity: variant.stockOnHand - variant.stockReserved })) })) };
+  });
+
   app.post('/admin/categories', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } }, schema: { tags: ['Administration'], security: [{ cookieAuth: [] }, { csrfToken: [] }] } }, async (request, reply) => {
     const { auth, user, csrfTokenHash } = await requireAdminPermission(app, request, 'PRODUCT_MANAGE');
     requireCsrf(auth, csrfTokenHash, request);
