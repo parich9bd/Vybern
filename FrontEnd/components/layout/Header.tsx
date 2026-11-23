@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import type { Locale } from '@/i18n/routing';
@@ -9,6 +9,8 @@ import { AuthenticationModal } from '@/components/auth/AuthenticationModal';
 import { apiUrl, AuthApiError, getCurrentUser, logout, type AuthUser } from '@/lib/auth-client';
 import { AnnouncementBar } from './AnnouncementBar';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { DemoCartDrawer } from '@/components/cart/DemoCartDrawer';
+import { demoCartItemCount, useDemoCart } from '@/lib/demo-cart';
 import { BagIcon, CheckIcon, ChevronIcon, CloseIcon, GlassesIcon, LanguagesIcon, LocationIcon, LogoutIcon, MenuIcon, OrdersIcon, SearchIcon, SettingsIcon, ShieldIcon, UserIcon } from './icons';
 import styles from './Header.module.css';
 
@@ -46,14 +48,17 @@ export default function Header() {
   const [authUser, setAuthUser] = useState<AuthUser | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [accountError, setAccountError] = useState<string | null>(null);
+  const [isDemoCartOpen, setIsDemoCartOpen] = useState(false);
+  const demoCartItems = useDemoCart();
+  const demoCartCount = demoCartItemCount(demoCartItems);
   const accountButtonRef = useRef<HTMLButtonElement>(null);
   const accountSwitcherRef = useRef<HTMLDivElement>(null);
   const languageSwitcherRef = useRef<HTMLDivElement>(null);
   const accountCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const languageCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const menuId = useId();
-  const languageMenuId = useId();
-  const accountMenuId = useId();
+  const menuId = 'vybern-mobile-navigation';
+  const languageMenuId = 'vybern-language-menu';
+  const accountMenuId = 'vybern-account-menu';
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -157,7 +162,7 @@ export default function Header() {
         </button>
 
         <nav aria-label={t('mainNavigation')} className={styles.desktopNavigation}>
-          <PendingAction label={t('shop')}>{t('shop')}</PendingAction>
+          <Link className={styles.action} href="/shop">{t('shop')}</Link>
           <PendingAction label={t('collections')}>{t('collections')}</PendingAction>
           <PendingAction label={t('story')}>{t('story')}</PendingAction>
         </nav>
@@ -167,10 +172,10 @@ export default function Header() {
         </Link>
 
         <div className={styles.actions}>
-          <PendingAction className={styles.cart} label={t('cart')}>
+          <button aria-label={t('cartItemCount', { count: demoCartCount })} className={`${styles.action} ${styles.cart}`} onClick={() => setIsDemoCartOpen(true)} type="button">
             <BagIcon />
-            <span aria-label={t('cartItemCount', { count: 0 })} className={styles.cartCount}>0</span>
-          </PendingAction>
+            <span aria-hidden="true" className={styles.cartCount}>{demoCartCount}</span>
+          </button>
           <PendingAction label={t('search')}><SearchIcon /></PendingAction>
           <PendingAction className={styles.tryOn} label={t('virtualTryOn')}><GlassesIcon /><span>{t('virtualTryOn')}</span></PendingAction>
           <div className={styles.accountSwitcher} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setIsAccountOpen(false); }} onPointerEnter={keepAccountOpen} onPointerLeave={(event) => { if (event.pointerType === 'mouse') closeAccountSoon(); }} ref={accountSwitcherRef}>
@@ -251,11 +256,11 @@ export default function Header() {
       {isMobileMenuOpen && <div aria-hidden="true" className={styles.drawerBackdrop} onClick={() => { setIsMobileMenuOpen(false); menuButtonRef.current?.focus(); }} />}
       <aside aria-label={t('mainNavigation')} className={isMobileMenuOpen ? styles.mobileNavigationOpen : styles.mobileNavigation} id={menuId}>
         <nav aria-label={t('mainNavigation')} className={styles.mobileNavigationContent}>
-          <PendingAction label={t('shop')}><SearchIcon />{t('shop')}</PendingAction>
+          <Link className={styles.action} href="/shop" onClick={() => setIsMobileMenuOpen(false)}><SearchIcon />{t('shop')}</Link>
           <PendingAction label={t('collections')}><GlassesIcon />{t('collections')}</PendingAction>
           <PendingAction label={t('story')}><UserIcon />{t('story')}</PendingAction>
           <PendingAction label={t('virtualTryOn')}><GlassesIcon />{t('virtualTryOn')}</PendingAction>
-          <PendingAction label={t('cart')}><BagIcon />{t('cart')} <span className={styles.drawerCartCount}>0</span></PendingAction>
+          <button className={styles.action} onClick={() => { setIsMobileMenuOpen(false); setIsDemoCartOpen(true); }} type="button"><BagIcon />{t('cart')} <span className={styles.drawerCartCount}>{demoCartCount}</span></button>
           <div className={styles.drawerTheme}><span>THEME</span><ThemeToggle className={styles.action} /></div>
           <div className={styles.drawerLanguages}>{languages.map((language) => <button aria-current={locale === language.code ? 'true' : undefined} key={language.code} onClick={() => changeLocale(language.code)} type="button">{language.label}</button>)}</div>
         </nav>
@@ -266,6 +271,7 @@ export default function Header() {
         onClose={() => setIsAuthenticationOpen(false)}
         returnFocusRef={accountButtonRef}
       />
+      <DemoCartDrawer isOpen={isDemoCartOpen} onClose={() => setIsDemoCartOpen(false)} />
     </div>
   );
 }

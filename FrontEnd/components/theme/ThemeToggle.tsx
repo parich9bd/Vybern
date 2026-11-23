@@ -1,12 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { MoonIcon, SunIcon } from '@/components/layout/icons';
 
 type Theme = 'light' | 'dark';
 
 export function ThemeToggle({ className }: { className?: string }) {
-  const [theme, setTheme] = useState<Theme>(() => typeof document !== 'undefined' && document.documentElement.dataset.theme === 'light' ? 'light' : 'dark');
+  const t = useTranslations('Theme');
+  const [theme, setTheme] = useState<Theme>('dark');
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setTheme(document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'), 0);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const toggle = () => {
     const next = theme === 'dark' ? 'light' : 'dark';
@@ -15,7 +22,7 @@ export function ThemeToggle({ className }: { className?: string }) {
     setTheme(next);
   };
 
-  return <button aria-label={theme === 'dark' ? 'Light theme' : 'Dark theme'} className={className} onClick={toggle} type="button">
+  return <button aria-label={theme === 'dark' ? t('switchToLight') : t('switchToDark')} className={className} onClick={toggle} type="button">
     {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
   </button>;
 }

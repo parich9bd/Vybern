@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { AuthApiError, isE164PhoneNumber, normalisePhoneNumber, requestOtp, verifyOtp, type AuthUser } from '@/lib/auth-client';
 import { CloseIcon } from '@/components/layout/icons';
@@ -47,8 +47,8 @@ export function AuthenticationModal({ isOpen, onAuthenticated, onClose, returnFo
   const dialogRef = useRef<HTMLDialogElement>(null);
   const phoneInputRef = useRef<HTMLInputElement>(null);
   const otpInputRefs = useRef<Array<HTMLInputElement | null>>([]);
-  const titleId = useId();
-  const descriptionId = useId();
+  const titleId = 'vybern-authentication-title';
+  const descriptionId = 'vybern-authentication-description';
   const [step, setStep] = useState<Step>('phone');
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''));

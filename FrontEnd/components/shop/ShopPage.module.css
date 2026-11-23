@@ -1,0 +1,46 @@
+.page { min-block-size: calc(100dvh - var(--header-stack-height)); padding: clamp(3rem, 7vw, 6.5rem) clamp(1.25rem, 6vw, 7rem) 6rem; background: var(--background); color: var(--foreground); }
+.intro { max-inline-size: 42rem; margin: 0 auto clamp(2.75rem, 5vw, 4.75rem); text-align: center; }
+.intro p, .cardMeta > p { margin: 0 0 .85rem; color: var(--accent); font: 600 .66rem/1.2 var(--font-navigation); letter-spacing: .17em; text-transform: uppercase; }
+.intro h1 { margin: 0; font: 400 clamp(2.6rem, 6.2vw, 5.5rem)/.92 var(--font-editorial); letter-spacing: -.06em; }
+.intro span { display: block; max-inline-size: 31rem; margin: 1.35rem auto 0; color: var(--muted); font-size: clamp(.85rem, 1.25vw, 1rem); line-height: 1.7; }
+.collection { max-inline-size: 92rem; margin: auto; }
+.controls { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding-block-end: 1rem; border-block-end: 1px solid var(--border); }
+.categories { display: flex; flex-wrap: wrap; gap: .5rem; }
+.categories button, .sort select, .mobileFilterTrigger, .mobilePanel button, .mobilePanel select, .pagination button { border: 1px solid var(--border); background: transparent; color: var(--foreground); cursor: pointer; font: 600 .64rem/1 var(--font-navigation); letter-spacing: .1em; text-transform: uppercase; }
+.categories button { padding: .68rem .8rem; color: var(--muted); }
+.categories button[aria-pressed='true'], .categories button:hover { border-color: var(--accent); color: var(--accent); }
+.sort { display: grid; gap: .5rem; min-inline-size: 10rem; color: var(--muted); font: 600 .62rem/1 var(--font-navigation); letter-spacing: .11em; text-transform: uppercase; }
+.sort select, .mobilePanel select { min-block-size: 2.45rem; padding-inline: .65rem; background: var(--control-surface); color: var(--control-text); }
+.count { margin: 1rem 0 2rem; color: var(--muted); font-size: .78rem; }
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(1.25rem, 2.5vw, 2.6rem) clamp(1rem, 2vw, 1.75rem); direction: ltr; }
+.card { min-inline-size: 0; direction: inherit; }
+.image { position: relative; aspect-ratio: 1 / 1.08; overflow: hidden; background: var(--surface-elevated); color: var(--muted); }
+.imageLink { position: absolute; inset: 0; z-index: 1; display: block; }
+.image img { object-fit: contain; padding: 7%; box-sizing: border-box; transition: opacity 620ms cubic-bezier(.22, 1, .36, 1); }
+.secondaryImage { opacity: 0; }
+.image span { display: grid; place-items: center; block-size: 100%; font-size: .75rem; }
+.wishlist { position: absolute; z-index: 2; inset-block-start: .85rem; right: .85rem; display: grid; place-items: center; inline-size: 2.5rem; block-size: 2.5rem; border: 1px solid color-mix(in srgb, var(--border) 80%, transparent); border-radius: 50%; background: color-mix(in srgb, var(--surface-elevated) 82%, transparent); color: var(--foreground); cursor: pointer; backdrop-filter: blur(6px); }
+.wishlist svg { inline-size: 1rem; block-size: 1rem; stroke: currentColor; stroke-width: 1.5; }
+.wishlist[aria-pressed='true'] { border-color: var(--accent); color: var(--accent); }
+.cardMeta { padding-block: 1.05rem 1.8rem; direction: inherit; }
+.cardMeta > p { margin-block-end: .45rem; font-size: .58rem; }
+.cardMeta h2 { min-block-size: 2.3em; margin: 0; overflow-wrap: anywhere; font: 400 clamp(1.2rem, 1.65vw, 1.55rem)/1.15 var(--font-editorial); letter-spacing: -.03em; }
+.cardMeta h2 a { color: inherit; text-decoration: none; }
+.swatches { display: flex; flex-wrap: wrap; gap: .42rem; min-block-size: 1.45rem; margin-block-start: .85rem; }
+.swatch { display: grid; place-items: center; inline-size: 1.35rem; block-size: 1.35rem; padding: 0; border: 1px solid var(--border); border-radius: 50%; background: var(--surface); color: var(--muted); cursor: pointer; font: 600 .5rem/1 var(--font-navigation); }
+.swatch[aria-pressed='true'] { outline: 1px solid var(--accent); outline-offset: 3px; color: var(--accent); }
+.priceRow { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; margin-block-start: .85rem; }
+.priceRow strong { font-size: .82rem; font-weight: 600; }
+.available, .soldOut { font: 600 .58rem/1 var(--font-navigation); letter-spacing: .08em; text-transform: uppercase; }
+.available { color: var(--accent); }.soldOut { color: var(--muted); }
+.state { padding: 3rem 0; color: var(--muted); }
+.pagination { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-block-start: 2rem; color: var(--muted); font-size: .75rem; }
+.pagination button { min-block-size: 2.5rem; padding-inline: .9rem; }.pagination button:disabled { cursor: not-allowed; opacity: .4; }
+.mobileFilterTrigger, .mobilePanel { display: none; }
+.page[dir='rtl'] .intro p, .page[dir='rtl'] .cardMeta > p, .page[dir='rtl'] .categories button, .page[dir='rtl'] .sort, .page[dir='rtl'] .available, .page[dir='rtl'] .soldOut { letter-spacing: 0; text-transform: none; }
+.page[dir='rtl'] .intro h1, .page[dir='rtl'] .cardMeta h2 { font-family: var(--font-doran-display), var(--font-ui) !important; }
+.page[dir='rtl'] .card { direction: rtl; text-align: right; }.page[dir='rtl'] .swatches { direction: ltr; justify-content: flex-start; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) { .card:hover .secondaryImage { opacity: 1; }.wishlist:hover { border-color: var(--accent); color: var(--accent); } }
+@media (max-width: 960px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 650px) { .page { padding-inline: 1rem; padding-block-start: 3rem; }.intro { text-align: start; }.intro span { margin-inline: 0; }.controls { display: none; }.mobileFilterTrigger { display: inline-flex; align-items: center; justify-content: center; min-block-size: 2.75rem; inline-size: 100%; }.mobilePanel { display: grid; position: relative; z-index: 3; gap: 1.25rem; margin-block-start: .75rem; padding: 1rem; border: 1px solid var(--border); background: var(--surface-elevated); }.mobilePanel > div { display: grid; gap: 1rem; }.mobilePanel label { display: grid; gap: .45rem; color: var(--muted); font-size: .72rem; }.mobilePanel footer { display: flex; justify-content: flex-end; gap: .5rem; }.mobilePanel button { min-block-size: 2.5rem; padding-inline: .8rem; }.mobilePanel button:last-child { border-color: var(--accent); color: var(--accent); }.grid { gap: 1rem; }.image { aspect-ratio: 1 / 1.12; }.image img { padding: 5%; }.wishlist { inset-block-start: .55rem; right: .55rem; inline-size: 2.35rem; block-size: 2.35rem; }.cardMeta { padding-block: .85rem 1.25rem; }.cardMeta h2 { min-block-size: 2.5em; font-size: clamp(1.08rem, 5vw, 1.35rem); }.priceRow { align-items: flex-start; flex-direction: column; gap: .35rem; }.intro h1 { font-size: clamp(2.55rem, 12vw, 4rem); } }
+@media (max-width: 360px) { .grid { grid-template-columns: minmax(0, 1fr); }.image { aspect-ratio: 1 / 1.02; } }

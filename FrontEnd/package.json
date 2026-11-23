@@ -10,7 +10,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "validate:hero-translations": "node scripts/validate-hero-translations.mjs"
   },
   "dependencies": {
     "@fontsource-variable/vazirmatn": "^5.2.8",

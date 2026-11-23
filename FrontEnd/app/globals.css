@@ -17,6 +17,13 @@
   --taupe: #928575;
   --border: #3a352e;
   --focus: #f8f7f4;
+  --control-surface: #0d0c0a;
+  --control-text: #f5f2eb;
+  --control-placeholder: #97938b;
+  --control-disabled: #1b1916;
+  --control-error: #e8a4a0;
+  --panel-glass: rgb(15 14 12 / 80%);
+  --panel-shadow: rgb(0 0 0 / 22%);
   --font-navigation: "Avenir Next", "Helvetica Neue", "Segoe UI", sans-serif;
   --font-editorial: Iowan Old Style, Baskerville, "Times New Roman", serif;
   --font-ui: var(--font-navigation);
@@ -46,6 +53,13 @@ html[data-theme='light'] {
   --taupe: #746858;
   --border: #d8d0c3;
   --focus: #493719;
+  --control-surface: #fffdf8;
+  --control-text: #24211d;
+  --control-placeholder: #766f65;
+  --control-disabled: #e9e4da;
+  --control-error: #a64c45;
+  --panel-glass: rgb(255 253 248 / 88%);
+  --panel-shadow: rgb(72 54 30 / 18%);
 }
 
 * { border-color: var(--border); }
@@ -68,6 +82,14 @@ body {
 }
 
 ::selection { background: var(--accent); color: var(--background); }
+
+input:-webkit-autofill,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: var(--control-text);
+  box-shadow: 0 0 0 1000px var(--control-surface) inset;
+  caret-color: var(--control-text);
+}
 
 html[dir='rtl'] {
   --font-ui: 'Vazirmatn Local', Tahoma, sans-serif;
