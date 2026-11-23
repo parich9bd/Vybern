@@ -82,6 +82,18 @@ enum NotificationOutboxStatus {
   FAILED
 }
 
+enum ServiceRequestType {
+  EYE_EXAM
+  LENS_UPGRADE
+}
+
+enum ServiceRequestStatus {
+  PENDING
+  REVIEWING
+  CONTACTED
+  CLOSED
+}
+
 model User {
   id        String     @id @default(cuid())
   phone     String     @unique @db.VarChar(16)
@@ -99,8 +111,37 @@ model User {
   adminProvisioningEvents AdminProvisioningEvent[] @relation("ProvisioningTarget")
   addresses CustomerAddress[]
   discountRedemptions DiscountRedemption[]
+  serviceRequests ServiceRequest[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+}
+
+model ServiceRequest {
+  id                       String               @id @default(cuid())
+  reference                String               @unique @db.VarChar(24)
+  idempotencyKey           String               @unique @db.VarChar(128)
+  type                     ServiceRequestType
+  status                   ServiceRequestStatus @default(PENDING)
+  userId                   String?
+  fullName                 String               @db.VarChar(160)
+  phone                    String               @db.VarChar(16)
+  email                    String?              @db.VarChar(254)
+  examinationType          String?              @db.VarChar(64)
+  preferredDate            DateTime?
+  preferredTime            String?              @db.VarChar(16)
+  frameBrand               String?              @db.VarChar(120)
+  frameModel               String?              @db.VarChar(120)
+  lensType                 String?              @db.VarChar(64)
+  prescriptionAvailability String?              @db.VarChar(64)
+  consultationDate         DateTime?
+  notes                    String?              @db.VarChar(1000)
+  createdAt                DateTime             @default(now())
+  updatedAt                DateTime             @updatedAt
+  user                     User?                @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([type, status, createdAt])
+  @@index([phone, createdAt])
+  @@index([userId, createdAt])
 }
 
 model StoreSettings {

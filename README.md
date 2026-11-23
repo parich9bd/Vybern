@@ -75,10 +75,14 @@ The API is served under `/api/v1`. Confirmed public endpoints include:
 - `GET /products`
 - `GET /products/:slug`
 - `GET /categories`
+- `POST /service-requests/eye-exam`
+- `POST /service-requests/lens-upgrade`
 
 Authentication uses OTP verification. A successful verification sets an opaque HttpOnly session cookie and provides a CSRF token. Authenticated mutations, including cart, order, payment, address and administration actions, require the session cookie and `x-csrf-token` header. Order creation also requires an `Idempotency-Key` header.
 
 OTP requests require an E.164 number (for example, an Iranian number beginning `+98`). The service applies a per-number resend cooldown and per-number/per-IP request windows. The storefront honours the server's `Retry-After` response and shows a countdown; wait for it to complete rather than repeatedly submitting the form.
+
+Service requests are public contact requests, not confirmed appointments or orders. They require an `Idempotency-Key` header, are rate-limited, and are persisted with a `PENDING` status for staff review. After pulling the service-request feature, apply its additive Prisma migration with `npm run prisma:deploy`; never use `prisma migrate reset` for this workflow.
 
 Customer account endpoints include `GET/PATCH /account/profile`, `GET/POST/PATCH/DELETE /account/addresses`, `GET /orders`, `GET /orders/:orderId`, `GET /account/payments`, and `POST/GET/DELETE /account/avatar`. Avatar writes require CSRF protection; the avatar content endpoint only serves the authenticated owner.
 

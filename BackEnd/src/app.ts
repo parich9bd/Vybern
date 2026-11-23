@@ -28,6 +28,7 @@ import { shippingRoutes } from './modules/shipping/shipping.routes.js';
 import { discountRoutes } from './modules/discounts/discount.routes.js';
 import { settingsRoutes } from './modules/settings/settings.routes.js';
 import { adminUserManagementRoutes } from './modules/admin/user-management.routes.js';
+import { serviceRequestRoutes } from './modules/services/service-request.routes.js';
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -104,6 +105,7 @@ export async function buildApp(
   await app.register(settingsRoutes, { prefix: '/api/v1' });
   await app.register(adminUserManagementRoutes, { prefix: '/api/v1' });
   await app.register(productRoutes, { prefix: '/api/v1' });
+  await app.register(serviceRequestRoutes, { prefix: '/api/v1' });
   app.addHook('onClose', async () => { await Promise.all([prisma.$disconnect(), redis.close()]); });
   return app;
 }

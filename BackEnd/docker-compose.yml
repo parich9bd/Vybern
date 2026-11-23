@@ -1,3 +1,5 @@
+name: vybern-eyewear
+
 services:
   postgres:
     image: postgres:17-alpine
